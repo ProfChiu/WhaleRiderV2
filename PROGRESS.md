@@ -1,5 +1,10 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (repo)
+- Accomplished: git repo initialised; first commit pushed to the public GitHub repo https://github.com/ProfChiu/WhaleRiderV2 (main).
+- Decisions: assets/nurse/ is gitignored (generated). src/nurse_assets.js embeds the nurse art once built, so committing it later makes that art public.
+- Next: unchanged (nurse art, color pick, Levels 3–5).
+
 ## 2026-10-31 (3 slots, auto light)
 - Accomplished: back to 3 question slots and 3 castle lights on every level. The castle checks the slots left to right after each placement; the moment they form a legal statement equal to the GOAL it wins, even with slot 3 empty, and any unused light switches on by itself with a flash and chime.
 - Decisions: players aren't told how many cards a statement needs (harder). A wrong result fails when all 3 slots are full or no unused operator card could still fix it; CS1525 / CS1002 fire immediately.
