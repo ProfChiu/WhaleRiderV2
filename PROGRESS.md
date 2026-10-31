@@ -1,5 +1,11 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (versions)
+- Accomplished: the root index.html is now a version launcher. LIVE opens game/ (the working build); each frozen version opens its own copy. The title screen shows the version number and has an "◀ ALL VERSIONS" link back to the launcher.
+- Accomplished: froze the current game as v0.0, "Phase 1: the castle compiler" (versions/v0.0/, commit 6cf0844). Checked in a browser: v0.0 and LIVE both start and play, the back link works, no errors.
+- Decisions: snapshots are full copies of game/, so later edits never change them. tools/bump_version.py takes the version number explicitly. The shared bump-version skill is Dropbox online-only on this Mac and assumes a different layout, so this project has its own script.
+- Next: lock the 10 GAME 220 questions and build v0.1 in game/; when done, run `python3 tools/bump_version.py 0.1 "…" "…"`.
+
 ## 2026-10-31 (GAME 220 review)
 - Accomplished: checked the game against GAME220UNITY (course outline, voice guide, the LEARN // C# study app) and proposed 10 questions built from the course's "break it live" demos (C01–C15), using a text-adventure setting.
 - Decisions (proposed, not yet confirmed): retire the float Levels 1–2, since float, int.Parse, Dictionary and Stack/Queue are all outside the GAME 220 ceiling. Use a larger billboard that shows code with blanks ①②③. Use three card shapes (token, line, file). Each question lists its own outcomes (compile error / runtime crash / wrong output / win) in place of the arithmetic evaluator. Share the nurse voice with LEARN // C#.

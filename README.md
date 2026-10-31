@@ -8,11 +8,21 @@ The castle is the compiler: a legal statement opens the door, and a wrong one ge
 compiler error (CS1525, CS1002, CS0664…) plus a hint from the nurse.
 
 ## Play
-Open `index.html` in a browser (Phaser 3 loads from a CDN, so an internet connection is needed).
+Open `index.html` in a browser and pick a version: LIVE (the build in progress) or any
+frozen version (v0.0, v0.1, …). Phaser 3 loads from a CDN, so an internet connection is needed.
+
+## Versions
+- `game/` is the live build: edit this one.
+- `versions/vX.Y/` are frozen, self-contained copies. Never edit them.
+- To freeze the live build as a new version (after committing):
+  `python3 tools/bump_version.py 0.1 "Short title" "One or two sentences on what changed."`
+  This copies `game/`, stamps the version number on its title screen and adds it to the launcher.
 
 ## Files
-- `src/levels.js`: level data (given code, goal, cards, hints, the "legal" explanation)
-- `src/scenes.js`: game scenes: title, level, win overlay
-- `src/art.js`: stand-in art drawn in code (grey palette, teal accent)
-- `tools/build_nurse_assets.sh`: embeds the nurse mascot art into `src/nurse_assets.js`
+- `index.html`: version launcher (reads `versions/manifest.js`)
+- `game/src/levels.js`: level data (given code, goal, cards, hints, the "legal" explanation)
+- `game/src/scenes.js`: game scenes: title, level, win overlay
+- `game/src/art.js`: stand-in art drawn in code (grey palette, teal accent)
+- `tools/build_nurse_assets.sh`: embeds the nurse mascot art into `game/src/nurse_assets.js`
+- `tools/bump_version.py`: freezes `game/` as `versions/vX.Y/`
 - `PROGRESS.md`: dated build log
