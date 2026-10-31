@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Whale Rider: Code Quest</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #2b2f33; overflow: hidden; }
+    #game { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js"></script>
+  <script src="src/nurse_assets.js"></script>
+  <script src="src/levels.js"></script>
+  <script src="src/art.js"></script>
+  <script src="src/scenes.js"></script>
+  <script>
+    window.game = new Phaser.Game({
+      type: Phaser.AUTO,
+      parent: 'game',
+      width: GAME_SIZE.W, height: GAME_SIZE.H,
+      backgroundColor: '#2b2f33',
+      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      scene: SCENES,
+    });
+  </script>
+</body>
+</html>
