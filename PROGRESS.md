@@ -1,5 +1,10 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (GAME 220 review)
+- Accomplished: checked the game against GAME220UNITY (course outline, voice guide, the LEARN // C# study app) and proposed 10 questions built from the course's "break it live" demos (C01–C15), using a text-adventure setting.
+- Decisions (proposed, not yet confirmed): retire the float Levels 1–2, since float, int.Parse, Dictionary and Stack/Queue are all outside the GAME 220 ceiling. Use a larger billboard that shows code with blanks ①②③. Use three card shapes (token, line, file). Each question lists its own outcomes (compile error / runtime crash / wrong output / win) in place of the arithmetic evaluator. Share the nurse voice with LEARN // C#.
+- Next: Wan to confirm the 10 questions; then replace the build board's puzzle plan, rebuild the evaluator around per-question outcomes, and build the code-panel billboard and the line/file cards. Commit f10991f is still unpushed. The nurse art is still blocked.
+
 ## 2026-10-31 (repo)
 - Accomplished: git repo initialised; first commit pushed to the public GitHub repo https://github.com/ProfChiu/WhaleRiderV2 (main).
 - Decisions: assets/nurse/ is gitignored (generated). src/nurse_assets.js embeds the nurse art once built, so committing it later makes that art public.

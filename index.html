@@ -3,28 +3,61 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Whale Rider: Code Quest</title>
+  <title>Whale Rider: Versions</title>
   <style>
-    html, body { margin: 0; height: 100%; background: #2b2f33; overflow: hidden; }
-    #game { width: 100vw; height: 100vh; }
+    :root { --bg:#2b2f33; --panel:#363b40; --line:#4a5157; --ink:#eef1f3; --dim:#9aa1a7; --accent:#19c3c3; --gold:#f5c542; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+           font:16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 48px 16px 64px; }
+    h1 { margin:0; font-size: 40px; letter-spacing: 1px; }
+    .sub { margin: 4px 0 0; color: var(--accent); font-weight: 700; letter-spacing: 6px; font-size: 15px; }
+    .lede { color: var(--dim); margin: 18px 0 32px; }
+    .list { display: grid; gap: 12px; }
+    a.ver { display: grid; grid-template-columns: 92px 1fr auto; gap: 16px; align-items: center;
+            padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+            color: inherit; text-decoration: none; transition: border-color .15s, transform .15s; }
+    a.ver:hover, a.ver:focus-visible { border-color: var(--accent); transform: translateY(-2px); outline: none; }
+    .num { font: 700 22px ui-monospace, Menlo, monospace; color: var(--accent); }
+    .live .num { color: var(--gold); font-size: 16px; }
+    .title { font-weight: 700; }
+    .meta { color: var(--dim); font-size: 13px; }
+    .summary { color: #c9ced2; font-size: 14px; margin-top: 2px; }
+    .play { color: var(--accent); font-weight: 700; white-space: nowrap; }
+    .live { border-style: dashed; }
+    .empty { color: var(--dim); }
+    @media (max-width: 520px) {
+      a.ver { grid-template-columns: 1fr; gap: 4px; }
+      .play { justify-self: start; }
+    }
   </style>
 </head>
 <body>
-  <div id="game"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js"></script>
-  <script src="src/nurse_assets.js"></script>
-  <script src="src/levels.js"></script>
-  <script src="src/art.js"></script>
-  <script src="src/scenes.js"></script>
+  <main>
+    <h1>WHALE RIDER</h1>
+    <p class="sub">CODE QUEST</p>
+    <p class="lede">Pick a version to play. Each one is a frozen copy, so you can show how the game has changed over time.</p>
+    <div class="list" id="list"></div>
+  </main>
+  <script src="versions/manifest.js"></script>
   <script>
-    window.game = new Phaser.Game({
-      type: Phaser.AUTO,
-      parent: 'game',
-      width: GAME_SIZE.W, height: GAME_SIZE.H,
-      backgroundColor: '#2b2f33',
-      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-      scene: SCENES,
-    });
+    const list = document.getElementById('list');
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
+    function row(href, num, title, meta, summary, live) {
+      const a = el('a', 'ver' + (live ? ' live' : '')); a.href = href;
+      a.append(el('div', 'num', num));
+      const mid = el('div'); mid.append(el('div', 'title', title));
+      if (meta) mid.append(el('div', 'meta', meta));
+      if (summary) mid.append(el('div', 'summary', summary));
+      a.append(mid, el('div', 'play', '▶ Play'));
+      list.append(a);
+    }
+    row('game/index.html', 'LIVE', 'Work in progress', 'The current development build', 'May be unfinished or broken between versions.', true);
+    const vs = window.VERSIONS || [];
+    if (!vs.length) list.append(el('p', 'empty', 'No frozen versions yet.'));
+    for (const v of vs) {
+      row(v.path, 'v' + v.version, v.title, v.date + (v.commit ? '  ·  ' + v.commit : ''), v.summary, false);
+    }
   </script>
 </body>
 </html>

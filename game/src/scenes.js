@@ -226,7 +226,20 @@ class TitleScene extends Phaser.Scene {
     txt(this, W / 2, 380, 'Put the cards in the right order. Programs care about order.', { fontSize: '18px', color: '#c9ced2' }).setOrigin(0.5).setDepth(41);
     const b = txt(this, W / 2, 470, '▶  CLICK TO START', { fontSize: '22px', color: PAL.accentHex, fontStyle: 'bold' }).setOrigin(0.5).setDepth(41);
     this.tweens.add({ targets: b, alpha: 0.4, duration: 700, yoyo: true, repeat: -1 });
-    this.input.once('pointerdown', () => {
+    // Version tag + link back to the version picker (bottom corners).
+    const ver = window.APP_VERSION || 'dev';
+    txt(this, W - 20, H - 18, ver === 'dev' ? 'LIVE BUILD (dev)' : 'VERSION ' + ver, { fontSize: '14px', color: '#9aa1a7' })
+      .setOrigin(1, 1).setDepth(41);
+    let back = null;
+    if (window.APP_LAUNCHER) {
+      back = txt(this, 20, H - 18, '◀  ALL VERSIONS', { fontSize: '14px', color: PAL.accentHex, fontStyle: 'bold' })
+        .setOrigin(0, 1).setDepth(42).setInteractive({ useHandCursor: true });
+      back.on('pointerdown', () => { window.location.href = window.APP_LAUNCHER; });
+    }
+    let started = false;
+    this.input.on('pointerdown', (p, over) => {
+      if (started || (back && over.includes(back))) return;   // the versions link handles itself
+      started = true;
       Sfx.unlock(); Sfx.click();
       this.cameras.main.fadeOut(300, 43, 47, 51);
       this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Level', { levelIndex: 0 }));
