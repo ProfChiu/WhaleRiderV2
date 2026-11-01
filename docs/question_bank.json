@@ -318,23 +318,21 @@
     "given": "class Player { int hp = 30;\n  void TakeDamage(int amount) { ? } }",
     "goal": "hp is 20 after TakeDamage(10)",
     "solution": [
-      "hp",
-      "=",
-      "hp - amount",
-      ";"
+      "hp =",
+      "hp - amount;"
     ],
     "decoys": [
       {
-        "card": "int hp",
-        "why": "CS0165: use of unassigned local variable 'hp'. int makes a NEW hp that hides the field."
+        "card": "int hp =",
+        "why": "CS0165: use of unassigned local variable 'hp'. int makes a NEW hp that hides the field, then tries to read it before it has a value."
       },
       {
-        "card": "amount",
-        "why": "Runs, but hp becomes 10: it was replaced, not reduced."
+        "card": "amount;",
+        "why": "Runs, but hp becomes 10: hp = amount replaces the health instead of reducing it."
       }
     ],
     "mechanic": "slots",
-    "review": "4-card answer. Needs a 2-line GIVEN.",
+    "review": "2-card answer, 2 decoys, 4 slots. Each decoy looks like it fits one of the two answer slots.",
     "slots": 4
   },
   {
@@ -377,16 +375,16 @@
     ],
     "decoys": [
       {
-        "card": "the two cards reversed",
-        "why": "NullReferenceException: inn is still null when line 1 runs. Order matters!"
+        "card": "Room inn = new Room();",
+        "why": "Runs, but makes a NEW local inn. The world's inn field is still null, so the world has no inn (same trap as Q13)."
       },
       {
-        "card": "Room inn = new Room();",
-        "why": "Runs, but makes a NEW local inn. The world's inn field is still null (same trap as Q13)."
+        "card": "inn = Room;",
+        "why": "CS0119: Room is a type, not a value. Build one with new Room()."
       }
     ],
     "mechanic": "slots",
-    "review": "2-card answer where ORDER is the puzzle. The most common runtime crash.",
+    "review": "2-card answer, 2 decoys, 4 slots. Order matters too: placing inn.Name first throws NullReferenceException.",
     "slots": 4
   }
 ]

@@ -1,5 +1,10 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (review round 1)
+- Accomplished: Wan approved Q1–Q12 and Q14. Q13 and Q15 were rewritten as 2-card answers with 2 decoys each (4 slots): Q13 `hp =` › `hp - amount;` (decoys `int hp =`, `amount;`), Q15 `inn = new Room();` › `inn.Name = "Inn";` (decoys `Room inn = new Room();`, `inn = Room;`).
+- Decisions: Q15 was set back to Needs review because its cards changed. The board holds approval status; docs/question_bank.json holds the content.
+- Next: approve Q13 and Q15; build v0.1.
+
 ## 2026-10-31 (approval buttons)
 - Accomplished: each question on the Build Board now has an Approve button (with Undo), and the bank header counts how many are approved. The status dropdown is gone.
 - Decisions: Wan only approves. Built and Tested are set by Claude: Built once a question is in the live game, Tested once the automated playthrough passes.
