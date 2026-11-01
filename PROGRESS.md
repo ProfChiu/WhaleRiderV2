@@ -1,5 +1,10 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (v0.2 released)
+- Accomplished: froze today's build as v0.2, "15 GAME 220 questions" (versions/v0.2/), and pushed everything to GitHub (ProfChiu/WhaleRiderV2) with tags v0.0 and v0.2. The version picker lists LIVE, v0.2 and v0.0, and both frozen versions were checked in a browser.
+- Decisions: versions are numbered v0.N. v0.1 was skipped because it was never frozen. The next build is v0.3.
+- Next (v0.3): Wan's playtest notes; nurse art (Make Available Offline on _ASSETS/Characters/NURSE, then tools/build_nurse_assets.sh); final art via game/art/ + tools/build_art.py; a decision on whether src/nurse_assets.js should be public before it embeds the mascot.
+
 ## 2026-10-31 (playtest fixes)
 - Accomplished: every level deals 5 cards or fewer. Q10 lost its separate `;` card (answer `return` › `hp` › `+ 10;`); Q4 dropped the `health = 0` decoy; Q14 dropped the `items[1]` decoy.
 - Accomplished: cards are bigger (104×156). Drop slots are small targets (74×110), and a placed card shrinks to sit in its slot, since the board shows its full code.

@@ -1,0 +1,8 @@
+{
+  "version": "0.2",
+  "title": "15 GAME 220 questions",
+  "summary": "The castle compiles real beginner C# mistakes: 15 levels from the GAME 220 classes, each decoy giving a real compile error, runtime crash, wrong result or endless loop. Uniform cards, small drop slots, and a code board whose blanks fill in as you play.",
+  "date": "2026-10-31",
+  "commit": "bf55a0e",
+  "path": "versions/v0.2/index.html"
+}
