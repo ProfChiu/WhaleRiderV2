@@ -1,5 +1,11 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (v0.1 build)
+- Accomplished: the live game now plays all 15 approved GAME 220 questions. Each decoy card has its own outcome, each with its own look: compile error (red, CS code), runtime crash (orange flash and big shake), wrong result (blue), timeout (purple chasing lights). Some questions also have a sequence outcome (Q3 CS0165, Q10 "returns 20", Q15 NullReferenceException), and a wrong order gets "won't compile".
+- Accomplished: cards are as wide as their code. The slot row grows like a line of code. Dealt cards wait in a tray on the ground. The billboard is bigger, with multi-line GIVEN. There are 3 or 4 slots and lights per level.
+- Verified: an automated playthrough of all 15 levels (a decoy, the sequence outcomes and the solution each) plus a real mouse-drag run, with no console errors. All 15 are marked Tested on the Build Board.
+- Next: Wan playtests the live build; then freeze it with `python3 tools/bump_version.py 0.1 …`; nurse art is still blocked.
+
 ## 2026-10-31 (review round 1)
 - Accomplished: Wan approved Q1–Q12 and Q14. Q13 and Q15 were rewritten as 2-card answers with 2 decoys each (4 slots): Q13 `hp =` › `hp - amount;` (decoys `int hp =`, `amount;`), Q15 `inn = new Room();` › `inn.Name = "Inn";` (decoys `Room inn = new Room();`, `inn = Room;`).
 - Decisions: Q15 was set back to Needs review because its cards changed. The board holds approval status; docs/question_bank.json holds the content.
