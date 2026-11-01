@@ -93,14 +93,10 @@
       {
         "card": "health == 0",
         "why": "Runs, but prints nothing: 10 - 15 = -5, and health is -5, not 0. Track the value!"
-      },
-      {
-        "card": "health = 0",
-        "why": "CS0029: cannot implicitly convert int to bool. = assigns, == compares."
       }
     ],
     "mechanic": "slots",
-    "review": "Logic level: two correct answers (< 0 and <= 0). Players must track health through 3 lines first.",
+    "review": "Logic level: two correct answers (< 0 and <= 0). Players must track health through 3 lines first. 5 cards.",
     "slots": 3
   },
   {
@@ -242,8 +238,7 @@
     "solution": [
       "return",
       "hp",
-      "+ 10",
-      ";"
+      "+ 10;"
     ],
     "decoys": [
       {
@@ -251,12 +246,12 @@
         "why": "CS0161: not all code paths return a value. Printing is not returning."
       },
       {
-        "card": "- 10",
+        "card": "- 10;",
         "why": "Runs, but Heal(20) returns 10. Wrong direction."
       }
     ],
     "mechanic": "slots",
-    "review": "4-card answer. Players must not stop at \"return hp;\" — that is legal but returns 20.",
+    "review": "3-card answer in 4 slots, 5 cards.",
     "slots": 4
   },
   {
@@ -264,24 +259,24 @@
     "title": "The Endless Shop",
     "concept": "C03 · A loop must change what it tests",
     "status": "idea",
-    "given": "int gold = 0;",
-    "goal": "loop ends with gold = 100",
+    "given": "int gold = 0;\nwhile (gold < 100)\n{\n    ?\n}",
+    "goal": "the loop ends with gold = 100",
     "solution": [
-      "while (gold < 100)",
-      "{ gold += 10; }"
+      "gold",
+      "+= 10;"
     ],
     "decoys": [
       {
-        "card": "{ Console.WriteLine(gold); }",
-        "why": "Infinite loop: gold never changes. The castle times out."
+        "card": "-= 10;",
+        "why": "Infinite loop: gold goes down forever and never reaches 100. The castle times out."
       },
       {
-        "card": "while (gold > 100)",
-        "why": "Runs, but the loop never starts: gold stays 0."
+        "card": "+ 10;",
+        "why": "CS0201: gold + 10 computes a value but does not store it."
       }
     ],
     "mechanic": "slots",
-    "review": "2-card answer in 4 slots; the two spare lights auto-succeed. Needs a \"castle times out\" outcome.",
+    "review": "The while line and braces are given; fill the body. 2-card answer in 4 slots, 5 cards (3rd decoy: Console.WriteLine(gold); also times out).",
     "slots": 4
   },
   {
@@ -352,14 +347,10 @@
       {
         "card": "i <= items.Length;",
         "why": "IndexOutOfRangeException: items[3] does not exist. Runtime crash!"
-      },
-      {
-        "card": "Console.WriteLine(items[1]);",
-        "why": "Runs, but prints Rope three times."
       }
     ],
     "mechanic": "slots",
-    "review": "4-card answer, a whole loop. C06 demo. Needs a \"runtime crash\" outcome.",
+    "review": "4-card answer, a whole loop. C06 demo. 5 cards.",
     "slots": 4
   },
   {

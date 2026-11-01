@@ -1,9 +1,11 @@
 // Whale Rider: Code Quest — Phase 1 scenes.
 const W = 1280, H = 720, GROUND = 560;
-const CARD_W = 90, CARD_H = 136;               // every card is the same size
+const CARD_W = 104, CARD_H = 156;              // every card is the same size
 const LIFT = 16;   // how far a card rises when picked up
-const SLOT_W = CARD_W + 8, SLOT_H = CARD_H + 8, SLOT_GAP = 10;
+const CARD_Y = GROUND - 8 - CARD_H / 2;                           // the dealt cards stand on the ground
+const SLOT_W = 74, SLOT_H = 110, SLOT_GAP = 10;                   // drop targets: just big enough to aim at
 const SLOT_X0 = 250, SLOT_Y = GROUND - 8 - SLOT_H / 2;            // answer slots stand beside the castle
+const PLACED_S = (SLOT_W - 6) / CARD_W;                           // a card shrinks to sit in its slot
 const BOARD = { x: 110, y: 50, w: 800, h: 322 };  // billboard behind the castle; its left edge hides behind the tower
 const BOARD_TEXT_X = 250, CODE_X = 304, CODE_Y0 = 84, CODE_LH = 24;   // board content starts right of the tower
 const LIGHT_OFF = 0x555c62;
@@ -191,7 +193,7 @@ class Card extends Phaser.GameObjects.Container {
     this.on('pointerout', () => { if (!this.held && !this.hinted) this.glow.setVisible(false); });
     this.on('pointerdown', p => h.press(this, p));
   }
-  setLifted(on) {
+  setLifted(on, rest = 1) {
     if (!this.shadow) {
       this.shadow = this.scene.add.graphics();
       this.shadow.fillStyle(0x000000, 0.28).fillRoundedRect(-this.w / 2 + 6, -this.h / 2 + LIFT + 4, this.w, this.h, 9);
@@ -201,7 +203,7 @@ class Card extends Phaser.GameObjects.Container {
     this.shadow.setVisible(on);
     this.glow.setVisible(on);
     this.setDepth(on ? 20 : this.baseDepth || 10);
-    this.scene.tweens.add({ targets: this, scale: on ? 1.08 : 1, angle: on ? -2 : 0, duration: 120, ease: 'Sine.Out' });
+    this.scene.tweens.add({ targets: this, scale: on ? 1.08 : rest, angle: on ? -2 : 0, duration: 120, ease: 'Sine.Out' });
   }
   setHint(on) {
     this.hinted = on;
@@ -496,10 +498,10 @@ class LevelScene extends Phaser.Scene {
   }
   // The dealt cards stand in a row between the slots and the nurse (overlapping a little if crowded).
   playerLayout(cards) {
-    const x0 = this.slotX[this.nSlots - 1] + SLOT_W / 2 + 26 + CARD_W / 2, x1 = NURSE_X - 78;
+    const x0 = this.slotX[this.nSlots - 1] + SLOT_W / 2 + 24 + CARD_W / 2, x1 = NURSE_X - 70;
     const n = cards.length, step = n > 1 ? Math.min(CARD_W + 10, (x1 - x0) / (n - 1)) : 0;
     const pos = new Map();
-    cards.forEach((c, i) => { pos.set(c, { x: x0 + i * step, y: SLOT_Y }); c.baseDepth = 10 + i * 0.01; c.setDepth(c.baseDepth); });
+    cards.forEach((c, i) => { pos.set(c, { x: x0 + i * step, y: CARD_Y }); c.baseDepth = 10 + i * 0.01; c.setDepth(c.baseDepth); });
     return pos;
   }
   async whaleDrop(defs) {
@@ -598,10 +600,10 @@ class LevelScene extends Phaser.Scene {
   release() {
     const h = this.held; if (!h) return;
     this.held = null;
-    const c = h.card;
-    c.setLifted(false);
+    const c = h.card, snap = h.moved && h.snap !== null && !this.slots[h.snap];
+    c.setLifted(false, snap ? PLACED_S : (c.slotIndex !== null ? PLACED_S : 1));
     if (!h.moved) return this.onCardClick(c);              // a plain click
-    if (h.snap !== null && !this.slots[h.snap]) { Sfx.click(); return this.placeInSlot(c, h.snap, 110); }
+    if (snap) { Sfx.click(); return this.placeInSlot(c, h.snap, 110); }
     flyTo(this, c, c.home.x, c.home.y, 320, -40);
     this.updateGlow();
   }
@@ -626,7 +628,7 @@ class LevelScene extends Phaser.Scene {
     if (card.slotIndex !== null) {       // take it back out
       this.slots[card.slotIndex] = null;
       card.slotIndex = null;
-      flyTo(this, card, card.home.x, card.home.y, 350, -60);
+      flyTo(this, card, card.home.x, card.home.y, 350, -60, { scale: 1 });
       this.layoutSlots();
       this.updateGlow();
       return;
@@ -639,7 +641,7 @@ class LevelScene extends Phaser.Scene {
     this.clearHints(); this.hush();
     this.slots[idx] = card; card.slotIndex = idx;
     this.state = 'moving'; this.updateGlow();
-    flyTo(this, card, this.slotX[idx], SLOT_Y, dur, dur < 300 ? -15 : -80).then(() => { Sfx.land(); this.refreshBoard(idx); this.afterPlace(); });
+    flyTo(this, card, this.slotX[idx], SLOT_Y, dur, dur < 300 ? -15 : -80, { scale: PLACED_S }).then(() => { Sfx.land(); this.refreshBoard(idx); this.afterPlace(); });
   }
   clearHints() { this.cards.forEach(c => c.hinted && c.setHint(false)); }
   afterPlace() {
@@ -694,7 +696,7 @@ class LevelScene extends Phaser.Scene {
     idxs.forEach(i => {
       const c = this.slots[i]; if (!c) return;
       this.slots[i] = null; c.slotIndex = null;
-      flyTo(this, c, c.home.x, c.home.y, 400, -70);
+      flyTo(this, c, c.home.x, c.home.y, 400, -70, { scale: 1 });
     });
     this.failIdx = [];
     this.layoutSlots();

@@ -1,5 +1,12 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (playtest fixes)
+- Accomplished: every level deals 5 cards or fewer. Q10 lost its separate `;` card (answer `return` › `hp` › `+ 10;`); Q4 dropped the `health = 0` decoy; Q14 dropped the `items[1]` decoy.
+- Accomplished: cards are bigger (104×156). Drop slots are small targets (74×110), and a placed card shrinks to sit in its slot, since the board shows its full code.
+- Accomplished: Q9's goal now reads "if key is the character 'A', runs Attack() and stops". Q11 now gives the `while (gold < 100) { … }` loop and the player fills in the body (`gold` › `+= 10;`; `-= 10;` and printing time out, `+ 10;` gives CS0201).
+- Verified: all 15 levels plus a real mouse drag, no console errors. The question bank and Build Board are updated.
+- Next: Wan playtests; freeze as v0.1.
+
 ## 2026-10-31 (card layout)
 - Accomplished: redesigned to match Wan's sketch. Every card is the same portrait size (90×136), with the code shrunk and wrapped to fit without splitting words. Card-sized answer slots stand beside the castle; the dealt cards stand in a row to their right.
 - Accomplished: the billboard is bigger (800×322) and stands behind the castle, with all content right of the tower. It shows the code listing with numbered blanks ①–④; a card dropped in a slot turns its blank into that code. Failing cards turn the outcome color, and on a win the listing becomes the plain compiled program plus a WHY note.
