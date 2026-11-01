@@ -3,6 +3,7 @@
 ## 2026-10-31 (question bank)
 - Accomplished: picked the 15 beginner C# mistakes that fit the current 3-slot token cards and wrote them as Q1–Q15, in GAME 220 class order (C01–C07). Each has GIVEN, GOAL, the solution cards and 2 decoys with the real C# result. Saved in docs/question_bank.json; replaced the 9 old puzzle cards on the Build Board and updated its format panel and findings.
 - Decisions: every decoy result is real C# behaviour (compile error code, runtime crash or wrong output). Dropped ideas that need line or file cards for now.
+- Update: from Q10 on, answers take 2–4 cards in 4 slots / 4 lights (Q10 4, Q11 2, Q12 3, Q13 4, Q14 4, Q15 2 with order as the puzzle), so players can't guess the length.
 - Next: review Q1–Q15 on the board; then v0.1 = a per-question outcome evaluator, crash and timeout looks, a 2-line GIVEN, and the levels loaded from the bank.
 
 ## 2026-10-31 (versions)

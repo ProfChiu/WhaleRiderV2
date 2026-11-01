@@ -22,7 +22,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "Mistake #1 and #2 in one level. A good first-day warm-up."
+    "review": "Mistake #1 and #2 in one level. A good first-day warm-up.",
+    "slots": 3
   },
   {
     "level": 2,
@@ -47,7 +48,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "Also covers string vs char."
+    "review": "Also covers string vs char.",
+    "slots": 3
   },
   {
     "level": 3,
@@ -72,7 +74,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "The castle wins only after = 0; an early ; triggers CS0165 on line 2."
+    "review": "The castle wins only after = 0; an early ; triggers CS0165 on line 2.",
+    "slots": 3
   },
   {
     "level": 4,
@@ -97,7 +100,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "The course's #1 bug (C02 demo)."
+    "review": "The course's #1 bug (C02 demo).",
+    "slots": 3
   },
   {
     "level": 5,
@@ -122,7 +126,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": null
+    "review": null,
+    "slots": 3
   },
   {
     "level": 6,
@@ -147,7 +152,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": null
+    "review": null,
+    "slots": 3
   },
   {
     "level": 7,
@@ -172,7 +178,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "int only, so it stays inside the GAME 220 ceiling."
+    "review": "int only, so it stays inside the GAME 220 ceiling.",
+    "slots": 3
   },
   {
     "level": 8,
@@ -196,7 +203,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "Two-card answer; the third light auto-succeeds."
+    "review": "Two-card answer; the third light auto-succeeds.",
+    "slots": 3
   },
   {
     "level": 9,
@@ -221,7 +229,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "C03 demo."
+    "review": "C03 demo.",
+    "slots": 3
   },
   {
     "level": 10,
@@ -232,21 +241,23 @@
     "goal": "Heal(20) returns 30",
     "solution": [
       "return",
-      "hp + 10",
+      "hp",
+      "+ 10",
       ";"
     ],
     "decoys": [
       {
-        "card": "Console.WriteLine(hp + 10)",
+        "card": "Console.WriteLine(hp + 10);",
         "why": "CS0161: not all code paths return a value. Printing is not returning."
       },
       {
-        "card": "hp + 10  (without return)",
-        "why": "CS0201: only assignment, call, increment… can be used as a statement."
+        "card": "- 10",
+        "why": "Runs, but Heal(20) returns 10. Wrong direction."
       }
     ],
     "mechanic": "slots",
-    "review": null
+    "review": "4-card answer. Players must not stop at \"return hp;\" — that is legal but returns 20.",
+    "slots": 4
   },
   {
     "level": 11,
@@ -265,12 +276,13 @@
         "why": "Infinite loop: gold never changes. The castle times out."
       },
       {
-        "card": "{ gold + 10; }",
-        "why": "CS0201: gold + 10 computes a value but does not store it."
+        "card": "while (gold > 100)",
+        "why": "Runs, but the loop never starts: gold stays 0."
       }
     ],
     "mechanic": "slots",
-    "review": "Needs a \"castle times out\" outcome."
+    "review": "2-card answer in 4 slots; the two spare lights auto-succeed. Needs a \"castle times out\" outcome.",
+    "slots": 4
   },
   {
     "level": 12,
@@ -295,7 +307,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": null
+    "review": "3-card answer.",
+    "slots": 4
   },
   {
     "level": 13,
@@ -305,13 +318,14 @@
     "given": "class Player { int hp = 30;\n  void TakeDamage(int amount) { ? } }",
     "goal": "hp is 20 after TakeDamage(10)",
     "solution": [
-      "hp =",
+      "hp",
+      "=",
       "hp - amount",
       ";"
     ],
     "decoys": [
       {
-        "card": "int hp =",
+        "card": "int hp",
         "why": "CS0165: use of unassigned local variable 'hp'. int makes a NEW hp that hides the field."
       },
       {
@@ -320,7 +334,8 @@
       }
     ],
     "mechanic": "slots",
-    "review": "Needs a 2-line GIVEN on the billboard."
+    "review": "4-card answer. Needs a 2-line GIVEN.",
+    "slots": 4
   },
   {
     "level": 14,
@@ -328,48 +343,50 @@
     "concept": "C06 · Arrays start at 0 and end at Length - 1",
     "status": "idea",
     "given": "string[] items = { \"Torch\", \"Rope\", \"Key\" };",
-    "goal": "prints all 3 items",
+    "goal": "prints Torch, Rope, Key",
     "solution": [
       "for (int i = 0;",
-      "i < items.Length",
-      "; i++)"
+      "i < items.Length;",
+      "i++)",
+      "Console.WriteLine(items[i]);"
     ],
     "decoys": [
       {
-        "card": "i <= items.Length",
+        "card": "i <= items.Length;",
         "why": "IndexOutOfRangeException: items[3] does not exist. Runtime crash!"
       },
       {
-        "card": "i < 2",
-        "why": "Runs, but prints only 2 items."
+        "card": "Console.WriteLine(items[1]);",
+        "why": "Runs, but prints Rope three times."
       }
     ],
     "mechanic": "slots",
-    "review": "C06 demo. Needs a \"runtime crash\" outcome."
+    "review": "4-card answer, a whole loop. C06 demo. Needs a \"runtime crash\" outcome.",
+    "slots": 4
   },
   {
     "level": 15,
     "title": "The Empty Room",
-    "concept": "C07 · Objects must be created with new",
+    "concept": "C07 · Objects must be created with new, before use",
     "status": "idea",
-    "given": "class World { Room inn;\n  void Start() { inn.Name = \"Inn\"; } }",
-    "goal": "Start() sets the inn's name",
+    "given": "class World { Room inn;\n  void Start() { ? } }",
+    "goal": "the world's inn is named \"Inn\"",
     "solution": [
-      "inn",
-      "= new Room()",
-      ";"
+      "inn = new Room();",
+      "inn.Name = \"Inn\";"
     ],
     "decoys": [
       {
-        "card": ";  (right after inn)",
-        "why": "NullReferenceException: inn is null. It was declared but never built."
+        "card": "the two cards reversed",
+        "why": "NullReferenceException: inn is still null when line 1 runs. Order matters!"
       },
       {
-        "card": "= Room",
-        "why": "CS0119: Room is a type, not a value. Use new Room()."
+        "card": "Room inn = new Room();",
+        "why": "Runs, but makes a NEW local inn. The world's inn field is still null (same trap as Q13)."
       }
     ],
     "mechanic": "slots",
-    "review": "C07. The most common runtime crash."
+    "review": "2-card answer where ORDER is the puzzle. The most common runtime crash.",
+    "slots": 4
   }
 ]
