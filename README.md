@@ -24,6 +24,7 @@ frozen version (v0.0, v0.1, …). Phaser 3 loads from a CDN, so an internet conn
 - `game/src/levels.js`: the 15 levels: given code, goal, cards, each decoy's outcome, the "legal" explanation
 - `game/src/scenes.js`: game scenes: title, level, win overlay
 - `game/src/art.js`: stand-in art drawn in code (grey palette, teal accent)
+- `game/art/`: drop final art here (see its README), then run `python3 tools/build_art.py`
 - `tools/build_nurse_assets.sh`: embeds the nurse mascot art into `game/src/nurse_assets.js`
 - `docs/question_bank.json`: the reviewed question bank the levels are built from
 - `tools/bump_version.py`: freezes `game/` as `versions/vX.Y/`

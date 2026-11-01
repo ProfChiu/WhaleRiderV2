@@ -17,6 +17,8 @@ window.PAL = {
 window.buildTextures = function (scene) {
   const P = window.PAL;
   const g = scene.make.graphics({ x: 0, y: 0, add: false });
+  // Final art wins: a texture already loaded from game/art/ (see tools/build_art.py) is never overwritten.
+  const gen = (gr, key, w, h) => { if (!scene.textures.exists(key)) gr.generateTexture(key, w, h); };
 
   // ---- Whale (faces LEFT, like the sketch: pointed snout, teeth, big eye) ----
   g.clear();
@@ -62,20 +64,20 @@ window.buildTextures = function (scene) {
   // gill lines
   g.lineStyle(2, 0x5b636a, 1);
   for (let i = 0; i < 3; i++) g.lineBetween(160 + i * 12, 96, 154 + i * 12, 140);
-  g.generateTexture('whale', 560, 244);
+  gen(g, 'whale', 560, 244);
 
   // ---- Card back ----
   g.clear();
   g.fillStyle(P.cardBack, 1); g.fillRoundedRect(0, 0, 104, 140, 10);
   g.lineStyle(3, 0x2f3439, 1); g.strokeRoundedRect(1.5, 1.5, 101, 137, 10);
   g.lineStyle(2, P.accent, 0.8); g.strokeRoundedRect(10, 10, 84, 120, 6);
-  g.generateTexture('cardBack', 104, 140);
+  gen(g, 'cardBack', 104, 140);
 
   // ---- Confetti + spark ----
   g.clear(); g.fillStyle(0xffffff, 1); g.fillRect(0, 0, 10, 14);
-  g.generateTexture('confetti', 10, 14);
+  gen(g, 'confetti', 10, 14);
   g.clear(); g.fillStyle(0xffffff, 1); g.fillCircle(6, 6, 6);
-  g.generateTexture('spark', 12, 12);
+  gen(g, 'spark', 12, 12);
 
   // ---- Tree ----
   g.clear();
@@ -83,7 +85,7 @@ window.buildTextures = function (scene) {
   g.fillStyle(P.tree, 1);
   g.fillCircle(60, 70, 46); g.fillCircle(30, 100, 32); g.fillCircle(90, 100, 32);
   g.fillStyle(0x9ba39f, 1); g.fillCircle(48, 58, 18);
-  g.generateTexture('tree', 120, 190);
+  gen(g, 'tree', 120, 190);
 
   // ---- Pine ----
   g.clear();
@@ -92,12 +94,12 @@ window.buildTextures = function (scene) {
   g.fillTriangle(40, 0, 0, 80, 80, 80);
   g.fillTriangle(40, 40, -6, 130, 86, 130);
   g.fillTriangle(40, 80, -12, 160, 92, 160);
-  g.generateTexture('pine', 80, 190);
+  gen(g, 'pine', 80, 190);
 
   // ---- Cloud ----
   g.clear(); g.fillStyle(0xf4f6f7, 0.9);
   g.fillEllipse(70, 40, 120, 44); g.fillEllipse(45, 30, 60, 40); g.fillEllipse(95, 26, 70, 42);
-  g.generateTexture('cloud', 140, 70);
+  gen(g, 'cloud', 140, 70);
 
   // ---- Castle tower (door hole cut as dark arch) ----
   g.clear();
@@ -119,7 +121,7 @@ window.buildTextures = function (scene) {
   g.fillRect(52, 200, 96, 130); g.fillCircle(100, 200, 48);
   g.lineStyle(5, 0x4f565c, 1);
   g.strokeCircle(100, 200, 50);
-  g.generateTexture('tower', TW, TH);
+  gen(g, 'tower', TW, TH);
 
   // ---- Door panel (separate so it can swing open) ----
   g.clear();
@@ -130,7 +132,7 @@ window.buildTextures = function (scene) {
   for (let x = 16; x < 96; x += 16) g.lineBetween(x, 6, x, 178);
   g.fillStyle(0x3a3f44, 1); g.fillRect(0, 70, 96, 8); g.fillRect(0, 140, 96, 8);
   g.fillStyle(0x2b2f33, 1); g.fillCircle(80, 112, 5);
-  g.generateTexture('door', 96, 178);
+  gen(g, 'door', 96, 178);
 
   g.destroy();
 };

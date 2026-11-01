@@ -1,12 +1,13 @@
 // Whale Rider: Code Quest — Phase 1 scenes.
 const W = 1280, H = 720, GROUND = 560;
-const CARD_H = 58, CARD_MIN_W = 64;          // cards are as wide as their code
+const CARD_W = 90, CARD_H = 136;               // every card is the same size
 const LIFT = 16;   // how far a card rises when picked up
-const ROW_X0 = 236, SLOT_Y = 470, EMPTY_W = 120, SLOT_GAP = 26;   // the slot row: one line of code
-const TRAY_X0 = 30, TRAY_X1 = 1250, TRAY_Y = [622, 688], TRAY_GAP = 16;  // dealt cards wait on the ground
-const BOARD = { x: 14, y: 56, w: 700, h: 176 };  // the question billboard on the castle roof
+const SLOT_W = CARD_W + 8, SLOT_H = CARD_H + 8, SLOT_GAP = 10;
+const SLOT_X0 = 250, SLOT_Y = GROUND - 8 - SLOT_H / 2;            // answer slots stand beside the castle
+const BOARD = { x: 110, y: 50, w: 800, h: 322 };  // billboard behind the castle; its left edge hides behind the tower
+const BOARD_TEXT_X = 250, CODE_X = 304, CODE_Y0 = 84, CODE_LH = 24;   // board content starts right of the tower
 const LIGHT_OFF = 0x555c62;
-const NURSE_X = 1180, NURSE_H = 210;
+const NURSE_X = 1210, NURSE_H = 210;
 const TOWER_X = 20, TOWER_TOP = GROUND - 330;
 const DOOR_X = TOWER_X + 52, DOOR_Y = TOWER_TOP + 152, DOOR_CX = TOWER_X + 100;
 const MONO = 'Menlo, Consolas, "Courier New", monospace';
@@ -58,7 +59,8 @@ const Sfx = {
 class BootScene extends Phaser.Scene {
   constructor() { super('Boot'); }
   preload() {
-    const imgs = window.NURSE_IMG || {};
+    // Final art: game/art/*.png embedded by tools/build_art.py, plus the nurse. Anything missing is drawn in code.
+    const imgs = Object.assign({}, window.ART_IMG || {}, window.NURSE_IMG || {});
     Object.keys(imgs).forEach(k => this.load.image(k, imgs[k]));
   }
   create() {
@@ -83,6 +85,20 @@ class BootScene extends Phaser.Scene {
 
 // ---------------- Shared world drawing ----------------
 function drawWorld(scene) {
+  if (scene.textures.exists('background')) scene.add.image(0, 0, 'background').setOrigin(0).setDisplaySize(W, GROUND + 10).setDepth(0);
+  else drawScenery(scene);
+  if (scene.textures.exists('ground')) { scene.add.image(0, GROUND, 'ground').setOrigin(0).setDisplaySize(W, H - GROUND).setDepth(4); return; }
+  const gr = scene.add.graphics().setDepth(4);
+  gr.fillStyle(PAL.ground, 1); gr.fillRect(0, GROUND, W, H - GROUND);
+  gr.fillStyle(PAL.groundDark, 1); gr.fillRect(0, GROUND, W, 6);
+  gr.lineStyle(2, PAL.groundDark, 1);
+  for (let i = 0; i < 70; i++) {
+    const x = Phaser.Math.Between(0, W), y = Phaser.Math.Between(GROUND + 12, H - 6);
+    gr.lineBetween(x, y, x - 4, y - 8); gr.lineBetween(x, y, x + 1, y - 10); gr.lineBetween(x, y, x + 5, y - 7);
+  }
+}
+// Stand-in sky, hills and trees (replaced by game/art/background.png when it exists).
+function drawScenery(scene) {
   const g = scene.add.graphics().setDepth(0);
   g.fillGradientStyle(PAL.sky1, PAL.sky1, PAL.sky2, PAL.sky2, 1);
   g.fillRect(0, 0, W, GROUND);
@@ -99,37 +115,55 @@ function drawWorld(scene) {
   const trees = [[300, 'pine', 0.7], [600, 'tree', 0.8], [560, 'pine', 0.55], [990, 'tree', 0.9],
     [1050, 'pine', 0.65], [1240, 'tree', 0.75], [430, 'tree', 0.6], [760, 'pine', 0.5]];
   trees.forEach(([x, k, s]) => scene.add.image(x, GROUND + 4, k).setOrigin(0.5, 1).setScale(s).setDepth(3).setAlpha(0.9));
-  const gr = scene.add.graphics().setDepth(4);
-  gr.fillStyle(PAL.ground, 1); gr.fillRect(0, GROUND, W, H - GROUND);
-  gr.fillStyle(PAL.groundDark, 1); gr.fillRect(0, GROUND, W, 6);
-  gr.lineStyle(2, PAL.groundDark, 1);
-  for (let i = 0; i < 70; i++) {
-    const x = Phaser.Math.Between(0, W), y = Phaser.Math.Between(GROUND + 12, H - 6);
-    gr.lineBetween(x, y, x - 4, y - 8); gr.lineBetween(x, y, x + 1, y - 10); gr.lineBetween(x, y, x + 5, y - 7);
-  }
 }
 
 // ---------------- Card ----------------
-// A code card: one token, expression or whole line. Its width follows its text.
+// Break code into lines of at most n characters, breaking at a space or before . or (.
+// `hard` reports whether some word had to be cut in the middle.
+function wrapCode(s, n) {
+  const lines = []; let rest = s, hard = false;
+  while (rest.length > n) {
+    let cut = -1;
+    for (let i = n; i > 0; i--) { const ch = rest[i]; if (ch === ' ' || ch === '.' || ch === '(') { cut = i; break; } }
+    if (cut <= 0) { cut = n; hard = true; }
+    lines.push(rest.slice(0, cut).trimEnd()); rest = rest.slice(cut).trimStart();
+  }
+  lines.push(rest);
+  return { lines, hard };
+}
+// Every card is the same size. The code on it uses the biggest font that fits without cutting a word.
+function fitCode(label) {
+  for (const px of [30, 24, 19, 16, 14, 12, 11, 10]) {
+    const n = Math.floor((CARD_W - 12) / (px * 0.61));
+    const { lines, hard } = wrapCode(label, n);
+    if (!hard && lines.length * px * 1.3 <= CARD_H - 44) return { px, text: lines.join('\n') };
+  }
+  return { px: 10, text: wrapCode(label, 11).lines.join('\n') };
+}
 class Card extends Phaser.GameObjects.Container {
   constructor(scene, x, y, def) {
     super(scene, x, y);
     this.def = def; this.slotIndex = null; this.locked = false; this.faceUp = false;
-    const label = txt(scene, 0, 1, def.label, { fontFamily: MONO, fontSize: '15px', color: PAL.inkHex, fontStyle: 'bold' }).setOrigin(0.5);
-    const w = this.w = Math.max(CARD_MIN_W, Math.ceil(label.width) + 30), h = this.h = CARD_H;
+    const w = this.w = CARD_W, h = this.h = CARD_H;
     this.glow = scene.add.graphics();
-    this.glow.fillStyle(PAL.accent, 0.6).fillRoundedRect(-w / 2 - 6, -h / 2 - 6, w + 12, h + 12, 12);
+    this.glow.fillStyle(PAL.accent, 0.6).fillRoundedRect(-w / 2 - 6, -h / 2 - 6, w + 12, h + 12, 13);
     this.glow.setVisible(false);
     this.back = scene.add.image(0, 0, 'cardBack').setDisplaySize(w, h);
     this.face = scene.add.container(0, 0);
-    const f = scene.add.graphics();
-    f.fillStyle(PAL.cardFace, 1).fillRoundedRect(-w / 2, -h / 2, w, h, 9);
-    f.fillStyle(PAL.accent, 1).fillRoundedRect(-w / 2, -h / 2, 7, h, { tl: 9, bl: 9, tr: 0, br: 0 });
-    f.lineStyle(3, PAL.accent, 1).strokeRoundedRect(-w / 2, -h / 2, w, h, 9);
-    this.face.add([f, label]);
+    if (scene.textures.exists('cardFront')) {
+      this.face.add(scene.add.image(0, 0, 'cardFront').setDisplaySize(w, h));      // final art
+    } else {
+      const f = scene.add.graphics();
+      f.fillStyle(PAL.cardFace, 1).fillRoundedRect(-w / 2, -h / 2, w, h, 9);
+      f.fillStyle(PAL.accent, 1).fillRoundedRect(-w / 2, -h / 2, w, 22, { tl: 9, tr: 9, bl: 0, br: 0 });
+      f.lineStyle(3, PAL.accent, 1).strokeRoundedRect(-w / 2, -h / 2, w, h, 9);
+      f.lineStyle(1, 0xc9ced2, 1).lineBetween(-w / 2 + 10, h / 2 - 16, w / 2 - 10, h / 2 - 16);
+      this.face.add([f, txt(scene, 0, -h / 2 + 11, 'C#', { fontSize: '11px', fontStyle: 'bold', color: '#12393a' }).setOrigin(0.5)]);
+    }
+    const fit = fitCode(def.label);
+    this.face.add(txt(scene, 0, 6, fit.text, { fontFamily: MONO, fontSize: fit.px + 'px', color: PAL.inkHex, fontStyle: 'bold', align: 'center', lineSpacing: 2 }).setOrigin(0.5));
     this.face.setVisible(false);
-    this.check = txt(scene, w / 2 - 9, -h / 2 + 9, '✔', { fontSize: '14px', color: PAL.accentHex, fontStyle: 'bold' })
-      .setOrigin(0.5).setVisible(false);
+    this.check = txt(scene, w / 2 - 11, -h / 2 + 11, '✔', { fontSize: '14px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5).setVisible(false);
     this.add([this.glow, this.back, this.face, this.check]);
     this.setSize(w, h);
     scene.add.existing(this);
@@ -166,7 +200,7 @@ class Card extends Phaser.GameObjects.Container {
     this.held = on;
     this.shadow.setVisible(on);
     this.glow.setVisible(on);
-    this.setDepth(on ? 20 : 10);
+    this.setDepth(on ? 20 : this.baseDepth || 10);
     this.scene.tweens.add({ targets: this, scale: on ? 1.08 : 1, angle: on ? -2 : 0, duration: 120, ease: 'Sine.Out' });
   }
   setHint(on) {
@@ -291,83 +325,114 @@ class LevelScene extends Phaser.Scene {
     this.doorTag = txt(this, DOOR_CX, TOWER_TOP + 58, '', { fontFamily: MONO, fontSize: '14px', fontStyle: 'bold',
       backgroundColor: PAL.errorHex, padding: { x: 6, y: 3 } }).setOrigin(0.5).setDepth(8).setVisible(false);
   }
-  // The slots form one line of code beside the castle. Each slot grows to fit its card.
+  // Card-sized answer slots stand in a row beside the castle.
   buildSlots() {
     this.slotG = this.add.graphics().setDepth(7);
+    this.slotImgs = [];
     this.slotGlow = [];
-    this.badges = []; this.nums = []; this.arrows = [];
-    for (let i = 0; i < this.nSlots; i++) {
+    this.badges = []; this.nums = [];
+    this.slotX = [...Array(this.nSlots).keys()].map(i => SLOT_X0 + SLOT_W / 2 + i * (SLOT_W + SLOT_GAP));
+    this.slotX.forEach((x, i) => {
+      if (this.textures.exists('slot')) this.slotImgs.push(this.add.image(x, SLOT_Y, 'slot').setDisplaySize(SLOT_W, SLOT_H).setDepth(7));
       const glow = this.add.graphics().setDepth(7).setVisible(false);
+      glow.lineStyle(4, PAL.accent, 1).strokeRoundedRect(x - SLOT_W / 2 - 6, SLOT_Y - SLOT_H / 2 - 6, SLOT_W + 12, SLOT_H + 12, 13);
       this.tweens.add({ targets: glow, alpha: 0.35, duration: 600, yoyo: true, repeat: -1 });
       this.slotGlow.push(glow);
-      this.badges.push(this.add.circle(0, 0, 14, 0x3a3f44).setDepth(7));
-      this.nums.push(txt(this, 0, 0, String(i + 1), { fontSize: '15px', fontStyle: 'bold' }).setOrigin(0.5).setDepth(8));
-      if (i < this.nSlots - 1) this.arrows.push(txt(this, 0, SLOT_Y, '›', { fontSize: '28px', color: '#5b636a', fontStyle: 'bold' }).setOrigin(0.5).setDepth(7));
-    }
-    this.slotParts = [this.slotG, ...this.badges, ...this.nums, ...this.arrows];
+      this.badges.push(this.add.circle(x, SLOT_Y - SLOT_H / 2 - 18, 14, 0x3a3f44).setDepth(7));
+      this.nums.push(txt(this, x, SLOT_Y - SLOT_H / 2 - 18, String(i + 1), { fontSize: '15px', fontStyle: 'bold' }).setOrigin(0.5).setDepth(8));
+    });
+    this.slotParts = [this.slotG, ...this.slotImgs, ...this.badges, ...this.nums];
     this.layoutSlots();
   }
-  slotW(i) { const c = this.slots[i]; return c ? c.w + 8 : EMPTY_W; }
-  layoutSlots(skip = null) {
-    const h = CARD_H + 8, g = this.slotG;
-    let x = ROW_X0;
-    this.slotX = [];
-    g.clear();
-    for (let i = 0; i < this.nSlots; i++) {
-      const w = this.slotW(i), cx = x + w / 2;
-      this.slotX.push(cx);
-      if (this.slots[i]) g.lineStyle(2, PAL.slot, 0.7).strokeRoundedRect(x, SLOT_Y - h / 2, w, h, 10);
-      else {
-        g.fillStyle(0x8c949a, 0.85).fillRoundedRect(x, SLOT_Y - h / 2, w, h, 10);
-        g.lineStyle(3, PAL.slot, 1).strokeRoundedRect(x, SLOT_Y - h / 2, w, h, 10);
-      }
-      this.slotGlow[i].clear().lineStyle(4, PAL.accent, 1).strokeRoundedRect(x - 7, SLOT_Y - h / 2 - 7, w + 14, h + 14, 12);
-      this.badges[i].setPosition(cx, SLOT_Y - h / 2 - 20);
-      this.nums[i].setPosition(cx, SLOT_Y - h / 2 - 20);
-      if (this.arrows[i]) this.arrows[i].setX(x + w + SLOT_GAP / 2);
-      const c = this.slots[i];
-      if (c && c !== skip && (!this.held || this.held.card !== c)) this.tweens.add({ targets: c, x: cx, y: SLOT_Y, duration: 180, ease: 'Sine.Out' });
-      x += w + SLOT_GAP;
-    }
+  // Redraw the slots and the code on the board after any change to what is in the slots.
+  layoutSlots() {
+    const g = this.slotG; g.clear();
+    if (!this.slotImgs.length) this.slotX.forEach(x => {
+      g.fillStyle(0x8c949a, 0.85).fillRoundedRect(x - SLOT_W / 2, SLOT_Y - SLOT_H / 2, SLOT_W, SLOT_H, 11);
+      g.lineStyle(3, PAL.slot, 1).strokeRoundedRect(x - SLOT_W / 2, SLOT_Y - SLOT_H / 2, SLOT_W, SLOT_H, 11);
+    });
+    if (this.codeRows) this.refreshBoard();
   }
   buildHud() {
     this.add.rectangle(W / 2, 20, W, 40, PAL.hud, 0.95).setDepth(30);
     txt(this, 20, 11, `LEVEL ${this.levelIndex + 1}  ·  ${this.L.course}  ·  ${this.L.title.toUpperCase()}`, { fontSize: '15px', color: '#c9ced2', fontStyle: 'bold', letterSpacing: 1 }).setDepth(31);
     txt(this, W - 20, 12, 'drag a card onto a slot  ·  or click it', { fontSize: '13px', color: '#8f989e' }).setOrigin(1, 0).setDepth(31);
   }
-  // The question lives on a billboard on the castle roof: the code so far, and the GOAL.
-  // On a win it shows the compiled, legal code.
+  // The billboard stands behind the castle (its left edge is hidden by the tower). It shows the
+  // code with a blank for each slot; a card dropped in a slot turns its blank into that code.
   buildBillboard() {
-    const L = this.L, bx = BOARD.x, by = BOARD.y, bw = BOARD.w, bh = BOARD.h, cx = bx + bw / 2, cy = by + bh / 2;
-    const posts = this.add.graphics().setDepth(4.9);
-    posts.fillStyle(0x4f565c, 1).fillRect(60, by + bh - 4, 12, TOWER_TOP - by - bh + 10).fillRect(170, by + bh - 4, 12, TOWER_TOP - by - bh + 10);
-    const X = v => v - cx, Y = v => v - cy;
-    this.bb = this.add.container(cx, cy).setDepth(9);
+    const B = BOARD, cx = B.x + B.w / 2, cy = B.y + B.h / 2;
+    this.X = v => v - cx; this.Y = v => v - cy;
+    const posts = this.add.graphics().setDepth(4.4);
+    posts.fillStyle(0x4f565c, 1);
+    [B.x + B.w - 60, B.x + B.w - 220].forEach(px => posts.fillRect(px, B.y + B.h - 6, 14, GROUND - B.y - B.h + 6));
+    this.bb = this.add.container(cx, cy).setDepth(4.5);
     this.board = this.add.graphics();
+    this.boardArt = this.textures.exists('board') ? this.add.image(0, 0, 'board').setDisplaySize(B.w, B.h) : null;
     this.tab = this.add.graphics();
-    this.tabText = txt(this, X(bx + 81), Y(by), 'QUESTION', { fontSize: '13px', fontStyle: 'bold', color: '#12393a', letterSpacing: 2 }).setOrigin(0.5);
-    const given = txt(this, X(bx + 86), Y(by + 20), L.given, { fontFamily: MONO, fontSize: '16px', color: '#e8ebed', lineSpacing: 4 });
-    const goalY = by + 20 + given.height + 12;
-    this.qParts = [
-      txt(this, X(bx + 18), Y(by + 23), 'GIVEN', { fontSize: '13px', color: PAL.accentHex, fontStyle: 'bold' }),
-      given,
-      txt(this, X(bx + 18), Y(goalY + 7), 'GOAL', { fontSize: '13px', color: PAL.accentHex, fontStyle: 'bold' }),
-      txt(this, X(bx + 86), Y(goalY), L.goal, { fontFamily: MONO, fontSize: '17px', color: '#ffffff', fontStyle: 'bold', backgroundColor: '#1f5f61', padding: { x: 8, y: 4 } }),
-    ];
-    this.legalCode = txt(this, X(bx + 18), Y(by + 22), '', { fontFamily: MONO, fontSize: '16px', color: '#ffffff', fontStyle: 'bold', wordWrap: { width: bw - 36 } });
-    this.legalNote = txt(this, X(bx + 18), Y(by + 60), '', { fontFamily: MONO, fontSize: '14px', color: '#9fd9d9', lineSpacing: 4 });
-    this.boardStatus = txt(this, X(bx + 18), Y(by + bh - 30), '', { fontSize: '14px', color: '#aeb5ba' });
-    this.boardHead = txt(this, X(bx + 18), Y(by + bh - 31), '', { fontFamily: MONO, fontSize: '15px', fontStyle: 'bold' });
-    this.bb.add([this.board, this.tab, this.tabText, ...this.qParts, this.legalCode, this.legalNote, this.boardHead, this.boardStatus]);
+    this.tabText = txt(this, this.X(BOARD_TEXT_X + 65), this.Y(B.y), 'QUESTION', { fontSize: '13px', fontStyle: 'bold', color: '#12393a', letterSpacing: 2 }).setOrigin(0.5);
+    this.codeRows = this.add.container(0, 0);
+    const goalY = CODE_Y0 + this.L.code.length * CODE_LH + 14;
+    this.goalLabel = txt(this, this.X(BOARD_TEXT_X), this.Y(goalY + 6), 'GOAL', { fontSize: '13px', color: PAL.accentHex, fontStyle: 'bold' });
+    this.goalText = txt(this, this.X(CODE_X), this.Y(goalY), this.L.goal, { fontFamily: MONO, fontSize: '17px', color: '#ffffff', fontStyle: 'bold', backgroundColor: '#1f5f61', padding: { x: 8, y: 4 } });
+    this.legalNote = txt(this, this.X(CODE_X), this.Y(goalY), '', { fontFamily: MONO, fontSize: '14px', color: '#9fd9d9', lineSpacing: 4 });
+    this.boardHead = txt(this, this.X(BOARD_TEXT_X), this.Y(B.y + B.h - 31), '', { fontFamily: MONO, fontSize: '15px', fontStyle: 'bold' });
+    this.boardStatus = txt(this, this.X(BOARD_TEXT_X), this.Y(B.y + B.h - 30), '', { fontSize: '14px', color: '#aeb5ba' });
+    this.bb.add([this.board, ...(this.boardArt ? [this.boardArt] : []), this.tab, this.tabText, this.codeRows,
+      this.goalLabel, this.goalText, this.legalNote, this.boardHead, this.boardStatus]);
+    this.failIdx = [];
     this.setBoardBorder(PAL.accent);
+    this.refreshBoard();
+  }
+  // Lay out the code listing: plain code, plus one chip per slot (a numbered blank, or the card's code).
+  refreshBoard(pop = -1, final = false) {
+    this.codeRows.removeAll(true);
+    const CIRCLED = ['①', '②', '③', '④'];
+    this.L.code.forEach((line, r) => {
+      const y = this.Y(CODE_Y0 + r * CODE_LH);
+      this.codeRows.add(txt(this, this.X(CODE_X - 14), y + 2, String(r + 1), { fontFamily: MONO, fontSize: '12px', color: '#6b737a' }).setOrigin(1, 0));
+      let x = this.X(CODE_X);
+      const parts = line.split(/(\{\d\})/);
+      parts.forEach((part, pi) => {
+        if (!part) return;
+        const m = part.match(/^\{(\d)\}$/);
+        let t;
+        if (!m) {
+          if (final && /^\s+$/.test(part) && pi > 0 && pi < parts.length - 1) {     // drop spaces next to an unused blank
+            const prev = parts[pi - 1].match(/^\{(\d)\}$/), next = parts[pi + 1].match(/^\{(\d)\}$/);
+            if ((prev && !this.slots[prev[1] - 1]) || (next && !this.slots[next[1] - 1])) return;
+          }
+          t = txt(this, x, y, part, { fontFamily: MONO, fontSize: '16px', color: '#c9ced2' });
+        } else {
+          const i = +m[1] - 1, c = this.slots[i];
+          if (final) {
+            if (!c) return;
+            t = txt(this, x, y, c.def.label, { fontFamily: MONO, fontSize: '16px', color: '#ffffff', fontStyle: 'bold' });
+          } else if (c) {
+            const bad = this.failIdx.includes(i);
+            t = txt(this, x, y - 2, c.def.label, { fontFamily: MONO, fontSize: '16px', color: '#ffffff', fontStyle: 'bold',
+              backgroundColor: bad ? this.failHex : '#1f6f70', padding: { x: 4, y: 2 } });
+            if (i === pop) { t.setScale(1.35).setAlpha(0); this.tweens.add({ targets: t, scale: 1, alpha: 1, duration: 260, ease: 'Back.Out' }); }
+          } else {
+            const next = this.state === 'play' && i === this.slots.indexOf(null);
+            t = txt(this, x, y - 2, ' ' + CIRCLED[i] + ' ', { fontFamily: MONO, fontSize: '16px', color: next ? '#12393a' : '#aeb5ba',
+              backgroundColor: next ? PAL.accentHex : '#4a5157', padding: { x: 4, y: 2 } });
+          }
+        }
+        this.codeRows.add(t);
+        x += t.width + (m && !final ? 2 : 0);
+      });
+    });
   }
   setBoardBorder(color) {
-    const { w: bw, h: bh } = BOARD, x = -bw / 2, y = -bh / 2;
+    const B = BOARD, x = -B.w / 2, y = -B.h / 2, tx = this.X(BOARD_TEXT_X);
     this.board.clear();
-    this.board.fillStyle(0x30353a, 0.97).fillRoundedRect(x, y, bw, bh, 10);
-    this.board.lineStyle(4, color, 1).strokeRoundedRect(x, y, bw, bh, 10);
-    this.board.lineStyle(1, 0x464c52, 1).lineBetween(x + 14, y + bh - 42, x + bw - 14, y + bh - 42);
-    this.tab.clear().fillStyle(color === PAL.gold ? PAL.gold : PAL.accent, 1).fillRoundedRect(x + 16, y - 12, 130, 24, 6);
+    if (!this.boardArt) {
+      this.board.fillStyle(0x30353a, 0.97).fillRoundedRect(x, y, B.w, B.h, 12);
+      this.board.lineStyle(1, 0x464c52, 1).lineBetween(tx - 10, y + B.h - 42, x + B.w - 16, y + B.h - 42);
+    }
+    this.board.lineStyle(5, color, 1).strokeRoundedRect(x, y, B.w, B.h, 12);
+    this.tab.clear().fillStyle(color === PAL.gold ? PAL.gold : PAL.accent, 1).fillRoundedRect(tx, y - 12, 130, 24, 6);
   }
   status(s, head = '', headHex = '#ffffff') {
     this.boardHead.setText(head).setColor(headHex);
@@ -429,31 +494,24 @@ class LevelScene extends Phaser.Scene {
     const m = child.getWorldTransformMatrix();
     return { x: m.tx, y: m.ty };
   }
-  // Lay the dealt cards out on the ground in up to two centred rows.
-  trayLayout(cards) {
-    const rows = [[]]; let x = 0;
-    cards.forEach(c => {
-      if (x > 0 && x + c.w > TRAY_X1 - TRAY_X0) { rows.push([]); x = 0; }
-      rows[rows.length - 1].push(c); x += c.w + TRAY_GAP;
-    });
+  // The dealt cards stand in a row between the slots and the nurse (overlapping a little if crowded).
+  playerLayout(cards) {
+    const x0 = this.slotX[this.nSlots - 1] + SLOT_W / 2 + 26 + CARD_W / 2, x1 = NURSE_X - 62;
+    const n = cards.length, step = n > 1 ? Math.min(CARD_W + 14, (x1 - x0) / (n - 1)) : 0;
     const pos = new Map();
-    rows.forEach((row, r) => {
-      const total = row.reduce((s, c) => s + c.w, 0) + TRAY_GAP * (row.length - 1);
-      let cx = (TRAY_X0 + TRAY_X1) / 2 - total / 2;
-      row.forEach(c => { pos.set(c, { x: cx + c.w / 2, y: TRAY_Y[Math.min(r, TRAY_Y.length - 1)] }); cx += c.w + TRAY_GAP; });
-    });
+    cards.forEach((c, i) => { pos.set(c, { x: x0 + i * step, y: SLOT_Y }); c.baseDepth = 10 + i * 0.01; c.setDepth(c.baseDepth); });
     return pos;
   }
   async whaleDrop(defs) {
     const whale = this.makeWhale(true, defs.length);
     Sfx.whale();
-    await new Promise(r => this.tweens.add({ targets: whale, x: 980, duration: 2200, ease: 'Sine.Out', onComplete: r }));
+    await new Promise(r => this.tweens.add({ targets: whale, x: 1010, duration: 2200, ease: 'Sine.Out', onComplete: r }));
     const landed = defs.map((def, i) => {
       const spr = whale.cardSprites[i], p = this.worldOf(whale, spr);
       spr.setVisible(false);
       return new Card(this, p.x, p.y, def).setScale(0.45).setAngle(spr.angle);
     });
-    const pos = this.trayLayout(landed);
+    const pos = this.playerLayout(landed);
     const drops = landed.map((card, i) => wait(this, i * 140)
       .then(() => flyTo(this, card, pos.get(card).x, pos.get(card).y, 700, -60, { angle: 0, scale: 1 })).then(() => Sfx.land()));
     // Nurse jumps off
@@ -485,6 +543,7 @@ class LevelScene extends Phaser.Scene {
     this.status('Fill the slots left to right. The castle checks the code as you go.');
     this.state = 'play';
     this.updateGlow();
+    this.refreshBoard();
   }
   async levelBanner() {
     const t1 = txt(this, W / 2, H / 2 - 40, `LEVEL ${this.levelIndex + 1}`, { fontSize: '96px', fontStyle: 'bold', stroke: '#2b2f33', strokeThickness: 10 })
@@ -527,7 +586,7 @@ class LevelScene extends Phaser.Scene {
     if (!h.moved && Phaser.Math.Distance.Between(p.x, p.y, h.sx, h.sy) > 6) {
       h.moved = true; this.clearHints(); this.hush();
       const c = h.card;
-      if (c.slotIndex !== null) { this.slots[c.slotIndex] = null; c.slotIndex = null; this.layoutSlots(c); }
+      if (c.slotIndex !== null) { this.slots[c.slotIndex] = null; c.slotIndex = null; this.layoutSlots(); }
     }
     if (!h.moved) return;
     const fx = p.x + h.ox, fy = p.y + h.oy;
@@ -553,10 +612,10 @@ class LevelScene extends Phaser.Scene {
     h.card.y += (h.ty - h.card.y) * k;
   }
   dropTarget(x, y) {
-    let best = null, bd = 110;
+    let best = null, bd = 95;
     this.slotX.forEach((sx, i) => {
       if (this.slots[i]) return;
-      const d = Math.hypot((x - sx) * 0.7, y - SLOT_Y);       // slots are wide: forgive horizontal distance a bit
+      const d = Math.hypot(x - sx, y - SLOT_Y);
       if (d < bd) { bd = d; best = i; }
     });
     return best;
@@ -568,7 +627,7 @@ class LevelScene extends Phaser.Scene {
       this.slots[card.slotIndex] = null;
       card.slotIndex = null;
       flyTo(this, card, card.home.x, card.home.y, 350, -60);
-      this.layoutSlots(card);
+      this.layoutSlots();
       this.updateGlow();
       return;
     }
@@ -580,8 +639,7 @@ class LevelScene extends Phaser.Scene {
     this.clearHints(); this.hush();
     this.slots[idx] = card; card.slotIndex = idx;
     this.state = 'moving'; this.updateGlow();
-    this.layoutSlots(card);
-    flyTo(this, card, this.slotX[idx], SLOT_Y, dur, dur < 300 ? -15 : -80).then(() => { Sfx.land(); this.afterPlace(); });
+    flyTo(this, card, this.slotX[idx], SLOT_Y, dur, dur < 300 ? -15 : -80).then(() => { Sfx.land(); this.refreshBoard(idx); this.afterPlace(); });
   }
   clearHints() { this.cards.forEach(c => c.hinted && c.setHint(false)); }
   afterPlace() {
@@ -602,7 +660,7 @@ class LevelScene extends Phaser.Scene {
     if (bad < 0) return {};                                      // so far so good: keep going
     return { out: ORDER_FAIL, cards: all.slice(bad) };
   }
-  resume() { this.state = 'play'; this.updateGlow(); }
+  resume() { this.state = 'play'; this.updateGlow(); this.refreshBoard(); }
   // Infinite loop: the lights chase round and round until the castle gives up.
   async spinLights(color) {
     for (let k = 0; k < 14; k++) {
@@ -622,6 +680,7 @@ class LevelScene extends Phaser.Scene {
     this.doorTag.setText(out.tag).setBackgroundColor(look.hex).setVisible(true);
     this.lights.forEach(l => l.setFillStyle(look.color));
     this.status(out.tag, look.head, look.hex);
+    this.failIdx = idxs; this.failHex = look.hex; this.refreshBoard();
     idxs.forEach(i => this.slots[i] && this.tweens.add({ targets: this.slots[i], angle: { from: -4, to: 4 }, duration: 60, yoyo: true, repeat: 3, onComplete: () => this.slots[i] && this.slots[i].setAngle(0) }));
     // Nurse = hint giver. Hints get stronger with each mistake on this level.
     this.mistakes++;
@@ -636,6 +695,7 @@ class LevelScene extends Phaser.Scene {
       this.slots[i] = null; c.slotIndex = null;
       flyTo(this, c, c.home.x, c.home.y, 400, -70);
     });
+    this.failIdx = [];
     this.layoutSlots();
     this.lights.forEach(l => l.setFillStyle(LIGHT_OFF));
     this.doorTag.setVisible(false);
@@ -653,17 +713,18 @@ class LevelScene extends Phaser.Scene {
 
   // ----- win: the castle compiled the code -----
   tweenP(cfg) { return new Promise(r => this.tweens.add(Object.assign({}, cfg, { onComplete: r }))); }
+  // The blanks become plain code: the listing on the board IS the compiled program.
   async showLegal() {
-    await this.tweenP({ targets: this.qParts, alpha: 0, duration: 250 });
     this.setBoardBorder(PAL.gold);
     this.tabText.setText('COMPILED ✔');
     this.status('');
     Sfx.lock();
-    const [code, ...notes] = this.L.legal;
-    for (let i = 1; i <= code.length; i++) { this.legalCode.setText(code.slice(0, i)); if (code[i - 1] !== ' ') await wait(this, 18); }
-    this.legalNote.setY(this.legalCode.y + this.legalCode.height + 12);
-    const note = notes.join('\n');
-    for (let i = 1; i <= note.length; i++) { this.legalNote.setText(note.slice(0, i)); if (note[i - 1] !== ' ') await wait(this, 10); }
+    this.refreshBoard(-1, true);
+    this.codeRows.list.forEach((t, i) => { t.setAlpha(0); this.tweens.add({ targets: t, alpha: 1, duration: 200, delay: i * 25 }); });
+    await this.tweenP({ targets: [this.goalText], alpha: 0, duration: 250 });
+    this.goalLabel.setText('WHY');
+    const note = this.L.legal.slice(1).join('\n');
+    for (let i = 1; i <= note.length; i++) { this.legalNote.setText(note.slice(0, i)); if (note[i - 1] !== ' ') await wait(this, 12); }
     this.status('The code is legal. The castle compiled it.');
   }
   async win(used) {

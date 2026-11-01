@@ -13,7 +13,8 @@
 //   crash   – a runtime exception;       `tag` is the exception name
 //   output  – runs, but misses the GOAL; `tag` is what it actually does
 //   timeout – an infinite loop;          the castle spins and gives up
-// `msg` is what the nurse says. `legal` is typed on the billboard after a win (line 1 = the code).
+// `code` is the listing on the billboard; {1}..{4} are the slots, and each one shows the
+// card placed in it. `msg` is what the nurse says. `legal` is typed on the billboard after a win (line 1 = the code).
 
 (() => {
 const compile = (tag, msg) => ({ kind: 'compile', tag, msg });
@@ -25,6 +26,7 @@ window.LEVELS = [
   {
     title: 'Wake the Terminal', course: 'C01', slots: 3,
     given: '// Print a greeting to the terminal',
+    code: ["// Print a greeting to the terminal", "{1}{2}{3}"],
     goal: 'Output:  Welcome, traveler!',
     cards: [
       { id: 'con', label: 'Console' },
@@ -39,6 +41,7 @@ window.LEVELS = [
   {
     title: 'Name the Hero', course: 'C01', slots: 3,
     given: "// Store the hero's name",
+    code: ["// Store the hero's name", "{1} {2}{3}"],
     goal: 'string hero = "Mira";',
     cards: [
       { id: 'decl', label: 'string hero =' },
@@ -53,6 +56,7 @@ window.LEVELS = [
   {
     title: 'Start the Score', course: 'C02', slots: 3,
     given: '// line 2:  score += 10;',
+    code: ["{1} {2}{3}", "score += 10;"],
     goal: 'score is 10 after line 2',
     cards: [
       { id: 'decl', label: 'int score' },
@@ -69,6 +73,7 @@ window.LEVELS = [
   {
     title: 'The Fall Check', course: 'C02', slots: 3,
     given: 'int health = 0;\n// if (?) Console.WriteLine("You fall.");',
+    code: ["int health = 0;", "{1}{2}{3}", "    Console.WriteLine(\"You fall.\");"],
     goal: 'prints  You fall.',
     cards: [
       { id: 'if', label: 'if (' },
@@ -83,6 +88,7 @@ window.LEVELS = [
   {
     title: 'Show the HP', course: 'C02', slots: 3,
     given: 'int hp = 10;',
+    code: ["int hp = 10;", "{1}{2}{3}"],
     goal: 'Output:  HP: 10',
     cards: [
       { id: 'open', label: 'Console.WriteLine(' },
@@ -97,6 +103,7 @@ window.LEVELS = [
   {
     title: 'Count the Gold', course: 'C02', slots: 3,
     given: 'int a = 1;   int b = 2;',
+    code: ["int a = 1;", "int b = 2;", "{1}{2}{3}"],
     goal: 'Output:  Gold: 3',
     cards: [
       { id: 'open', label: 'Console.WriteLine(' },
@@ -111,6 +118,7 @@ window.LEVELS = [
   {
     title: 'Leftover Potions', course: 'C02', slots: 3,
     given: 'int potions = 7;   // split between 2 players',
+    code: ["int potions = 7;   // split between 2 players", "{1} {2}{3}"],
     goal: 'left is 1',
     cards: [
       { id: 'decl', label: 'int left =' },
@@ -125,6 +133,7 @@ window.LEVELS = [
   {
     title: 'Only the Living Heal', course: 'C02', slots: 3,
     given: 'int hp = 0;',
+    code: ["int hp = 0;", "{1}", "    {2} {3}"],
     goal: 'Heal() runs only when hp > 0',
     cards: [
       { id: 'if', label: 'if (hp > 0)' },
@@ -138,6 +147,7 @@ window.LEVELS = [
   {
     title: 'The Menu That Fell Through', course: 'C03', slots: 3,
     given: 'switch (key) {\n  // case \'D\': Defend(); break;',
+    code: ["switch (key)", "{", "  {1} {2} {3}", "  case 'D': Defend(); break;", "}"],
     goal: "case 'A' runs Attack() and stops",
     cards: [
       { id: 'case', label: "case 'A':" },
@@ -152,6 +162,7 @@ window.LEVELS = [
   {
     title: "The Healer's Promise", course: 'C03', slots: 4,
     given: 'int Heal(int hp) {\n  // ?\n}',
+    code: ["int Heal(int hp)", "{", "    {1} {2} {3}{4}", "}"],
     goal: 'Heal(20) returns 30',
     cards: [
       { id: 'ret', label: 'return' },
@@ -170,6 +181,7 @@ window.LEVELS = [
   {
     title: 'The Endless Shop', course: 'C03', slots: 4,
     given: 'int gold = 0;',
+    code: ["int gold = 0;", "{1}", "    {2} {3} {4}"],
     goal: 'the loop ends with gold = 100',
     cards: [
       { id: 'while', label: 'while (gold < 100)' },
@@ -183,6 +195,7 @@ window.LEVELS = [
   {
     title: 'Take the Hit', course: 'C05', slots: 4,
     given: 'Player player = new Player();',
+    code: ["Player player = new Player();", "{1}{2}{3}{4}"],
     goal: 'player loses 15 hp',
     cards: [
       { id: 'obj', label: 'player' },
@@ -197,6 +210,7 @@ window.LEVELS = [
   {
     title: 'The Hit That Did Nothing', course: 'C05', slots: 4,
     given: 'class Player {  int hp = 30;\n  void TakeDamage(int amount) { ? }  }',
+    code: ["class Player", "{", "    int hp = 30;", "    void TakeDamage(int amount)", "    {", "        {1} {2} {3} {4}", "    }", "}"],
     goal: 'hp is 20 after TakeDamage(10)',
     cards: [
       { id: 'set', label: 'hp =' },
@@ -210,6 +224,7 @@ window.LEVELS = [
   {
     title: 'Count the Loot', course: 'C06', slots: 4,
     given: 'string[] items = { "Torch", "Rope", "Key" };',
+    code: ["string[] items = { \"Torch\", \"Rope\", \"Key\" };", "{1} {2} {3}", "    {4}"],
     goal: 'prints  Torch, Rope, Key',
     cards: [
       { id: 'init', label: 'for (int i = 0;' },
@@ -225,6 +240,7 @@ window.LEVELS = [
   {
     title: 'The Empty Room', course: 'C07', slots: 4,
     given: 'class World {  Room inn;\n  void Start() { ? }  }',
+    code: ["class World", "{", "    Room inn;", "    void Start()", "    {", "        {1}", "        {2} {3} {4}", "    }"],
     goal: 'the world\'s inn is named "Inn"',
     cards: [
       { id: 'make', label: 'inn = new Room();' },

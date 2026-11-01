@@ -1,5 +1,12 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (card layout)
+- Accomplished: redesigned to match Wan's sketch. Every card is the same portrait size (90×136), with the code shrunk and wrapped to fit without splitting words. Card-sized answer slots stand beside the castle; the dealt cards stand in a row to their right.
+- Accomplished: the billboard is bigger (800×322) and stands behind the castle, with all content right of the tower. It shows the code listing with numbered blanks ①–④; a card dropped in a slot turns its blank into that code. Failing cards turn the outcome color, and on a win the listing becomes the plain compiled program plus a WHY note.
+- Accomplished: an art drop-in. Put game/art/<texture>.png and run tools/build_art.py; drawn stand-ins are used only for what's missing (game/art/README.md lists the names and sizes). Tested with dummy art.
+- Verified: an automated playthrough of all 15 levels, no console errors.
+- Next: Wan playtests; freeze as v0.1; final art.
+
 ## 2026-10-31 (v0.1 build)
 - Accomplished: the live game now plays all 15 approved GAME 220 questions. Each decoy card has its own outcome, each with its own look: compile error (red, CS code), runtime crash (orange flash and big shake), wrong result (blue), timeout (purple chasing lights). Some questions also have a sequence outcome (Q3 CS0165, Q10 "returns 20", Q15 NullReferenceException), and a wrong order gets "won't compile".
 - Accomplished: cards are as wide as their code. The slot row grows like a line of code. Dealt cards wait in a tray on the ground. The billboard is bigger, with multi-line GIVEN. There are 3 or 4 slots and lights per level.
