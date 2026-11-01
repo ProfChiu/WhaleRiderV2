@@ -1,0 +1,375 @@
+[
+  {
+    "level": 1,
+    "title": "Wake the Terminal",
+    "concept": "C01 · Semicolons end statements; C# is case-sensitive",
+    "status": "idea",
+    "given": "// Print a greeting to the terminal",
+    "goal": "Output:  Welcome, traveler!",
+    "solution": [
+      "Console",
+      ".WriteLine(\"Welcome, traveler!\")",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": "console",
+        "why": "CS0103: the name 'console' does not exist. Case matters: it is Console."
+      },
+      {
+        "card": ":",
+        "why": "CS1002: ; expected. A colon is not a semicolon."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "Mistake #1 and #2 in one level. A good first-day warm-up."
+  },
+  {
+    "level": 2,
+    "title": "Name the Hero",
+    "concept": "C01 · Text needs double quotes",
+    "status": "idea",
+    "given": "// Store the hero's name",
+    "goal": "string hero = \"Mira\";",
+    "solution": [
+      "string hero =",
+      "\"Mira\"",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": "Mira",
+        "why": "CS0103: the name 'Mira' does not exist. Without quotes C# looks for a variable."
+      },
+      {
+        "card": "'Mira'",
+        "why": "CS1012: too many characters in character literal. Single quotes are for one char."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "Also covers string vs char."
+  },
+  {
+    "level": 3,
+    "title": "Start the Score",
+    "concept": "C02 · A variable must be given a value before it is used",
+    "status": "idea",
+    "given": "score += 10;      // line 2 adds points",
+    "goal": "score is 10 after line 2",
+    "solution": [
+      "int score",
+      "= 0",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": ";  (right after int score)",
+        "why": "CS0165: use of unassigned local variable 'score'. It was declared but never given a value."
+      },
+      {
+        "card": "= \"0\"",
+        "why": "CS0029: cannot convert string to int."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "The castle wins only after = 0; an early ; triggers CS0165 on line 2."
+  },
+  {
+    "level": 4,
+    "title": "The Fall Check",
+    "concept": "C02 · = assigns, == compares",
+    "status": "idea",
+    "given": "int health = 0;",
+    "goal": "if ( ? )  prints \"You fall.\"",
+    "solution": [
+      "if (",
+      "health == 0",
+      ")"
+    ],
+    "decoys": [
+      {
+        "card": "health = 0",
+        "why": "CS0029: cannot implicitly convert int to bool. = stores a value; == asks a question."
+      },
+      {
+        "card": "health < 0",
+        "why": "Runs, but prints nothing: health is 0, not below 0."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "The course's #1 bug (C02 demo)."
+  },
+  {
+    "level": 5,
+    "title": "Show the HP",
+    "concept": "C02 · String interpolation needs the $",
+    "status": "idea",
+    "given": "int hp = 10;",
+    "goal": "Output:  HP: 10",
+    "solution": [
+      "Console.WriteLine(",
+      "$\"HP: {hp}\"",
+      ");"
+    ],
+    "decoys": [
+      {
+        "card": "\"HP: {hp}\"",
+        "why": "Runs, but prints HP: {hp}. Without $ the braces are just text."
+      },
+      {
+        "card": "\"HP: \" hp",
+        "why": "CS1003: syntax error, ',' expected. Join text and values with + or use $."
+      }
+    ],
+    "mechanic": "slots",
+    "review": null
+  },
+  {
+    "level": 6,
+    "title": "Count the Gold",
+    "concept": "C02 · + joins text left to right",
+    "status": "idea",
+    "given": "int a = 1;  int b = 2;",
+    "goal": "Output:  Gold: 3",
+    "solution": [
+      "Console.WriteLine(",
+      "\"Gold: \" + (a + b)",
+      ");"
+    ],
+    "decoys": [
+      {
+        "card": "\"Gold: \" + a + b",
+        "why": "Runs, but prints Gold: 12. Once text is on the left, every + glues text."
+      },
+      {
+        "card": "\"Gold: \" - (a + b)",
+        "why": "CS0019: operator - cannot be applied to string and int."
+      }
+    ],
+    "mechanic": "slots",
+    "review": null
+  },
+  {
+    "level": 7,
+    "title": "Leftover Potions",
+    "concept": "C02 · int division drops the remainder; % keeps it",
+    "status": "idea",
+    "given": "int potions = 7;   // split between 2 players",
+    "goal": "left is 1",
+    "solution": [
+      "int left =",
+      "potions % 2",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": "potions / 2",
+        "why": "Runs, but left is 3. That is how many each player gets, not what is left."
+      },
+      {
+        "card": "potions - 2",
+        "why": "Runs, but left is 5."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "int only, so it stays inside the GAME 220 ceiling."
+  },
+  {
+    "level": 8,
+    "title": "Only the Living Heal",
+    "concept": "C02 · A ; after if ends the if",
+    "status": "idea",
+    "given": "int hp = 0;",
+    "goal": "Heal() runs only when hp > 0",
+    "solution": [
+      "if (hp > 0)",
+      "Heal();"
+    ],
+    "decoys": [
+      {
+        "card": ";",
+        "why": "Compiles (warning CS0642: possible mistaken empty statement), but Heal() now runs every time, even at hp 0."
+      },
+      {
+        "card": "if (hp = 0)",
+        "why": "CS0029: cannot convert int to bool."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "Two-card answer; the third light auto-succeeds."
+  },
+  {
+    "level": 9,
+    "title": "The Menu That Fell Through",
+    "concept": "C03 · Every switch case needs break",
+    "status": "idea",
+    "given": "switch (key) {",
+    "goal": "case 'A': runs Attack() and stops",
+    "solution": [
+      "case 'A':",
+      "Attack();",
+      "break;"
+    ],
+    "decoys": [
+      {
+        "card": "case 'D':",
+        "why": "CS0163: control cannot fall through from one case label to another. End the case with break;"
+      },
+      {
+        "card": "continue;",
+        "why": "Compiles inside the menu loop, but jumps straight back to the menu instead of ending the turn."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "C03 demo."
+  },
+  {
+    "level": 10,
+    "title": "The Healer's Promise",
+    "concept": "C03 · A method with a return type must return",
+    "status": "idea",
+    "given": "int Heal(int hp) {  ?  }",
+    "goal": "Heal(20) returns 30",
+    "solution": [
+      "return",
+      "hp + 10",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": "Console.WriteLine(hp + 10)",
+        "why": "CS0161: not all code paths return a value. Printing is not returning."
+      },
+      {
+        "card": "hp + 10  (without return)",
+        "why": "CS0201: only assignment, call, increment… can be used as a statement."
+      }
+    ],
+    "mechanic": "slots",
+    "review": null
+  },
+  {
+    "level": 11,
+    "title": "The Endless Shop",
+    "concept": "C03 · A loop must change what it tests",
+    "status": "idea",
+    "given": "int gold = 0;",
+    "goal": "loop ends with gold = 100",
+    "solution": [
+      "while (gold < 100)",
+      "{ gold += 10; }"
+    ],
+    "decoys": [
+      {
+        "card": "{ Console.WriteLine(gold); }",
+        "why": "Infinite loop: gold never changes. The castle times out."
+      },
+      {
+        "card": "{ gold + 10; }",
+        "why": "CS0201: gold + 10 computes a value but does not store it."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "Needs a \"castle times out\" outcome."
+  },
+  {
+    "level": 12,
+    "title": "Take the Hit",
+    "concept": "C05 · Call a method on the object",
+    "status": "idea",
+    "given": "Player player = new Player();",
+    "goal": "player loses 15 hp",
+    "solution": [
+      "player",
+      ".TakeDamage(15)",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": "Player",
+        "why": "CS0120: an object reference is required. Player is the class; player is your hero."
+      },
+      {
+        "card": "TakeDamage(player, 15)",
+        "why": "CS1501: no overload for TakeDamage takes 2 arguments. (C05 demo)"
+      }
+    ],
+    "mechanic": "slots",
+    "review": null
+  },
+  {
+    "level": 13,
+    "title": "The Hit That Did Nothing",
+    "concept": "C05 · Update the field, do not declare a new variable",
+    "status": "idea",
+    "given": "class Player { int hp = 30;\n  void TakeDamage(int amount) { ? } }",
+    "goal": "hp is 20 after TakeDamage(10)",
+    "solution": [
+      "hp =",
+      "hp - amount",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": "int hp =",
+        "why": "CS0165: use of unassigned local variable 'hp'. int makes a NEW hp that hides the field."
+      },
+      {
+        "card": "amount",
+        "why": "Runs, but hp becomes 10: it was replaced, not reduced."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "Needs a 2-line GIVEN on the billboard."
+  },
+  {
+    "level": 14,
+    "title": "Count the Loot",
+    "concept": "C06 · Arrays start at 0 and end at Length - 1",
+    "status": "idea",
+    "given": "string[] items = { \"Torch\", \"Rope\", \"Key\" };",
+    "goal": "prints all 3 items",
+    "solution": [
+      "for (int i = 0;",
+      "i < items.Length",
+      "; i++)"
+    ],
+    "decoys": [
+      {
+        "card": "i <= items.Length",
+        "why": "IndexOutOfRangeException: items[3] does not exist. Runtime crash!"
+      },
+      {
+        "card": "i < 2",
+        "why": "Runs, but prints only 2 items."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "C06 demo. Needs a \"runtime crash\" outcome."
+  },
+  {
+    "level": 15,
+    "title": "The Empty Room",
+    "concept": "C07 · Objects must be created with new",
+    "status": "idea",
+    "given": "class World { Room inn;\n  void Start() { inn.Name = \"Inn\"; } }",
+    "goal": "Start() sets the inn's name",
+    "solution": [
+      "inn",
+      "= new Room()",
+      ";"
+    ],
+    "decoys": [
+      {
+        "card": ";  (right after inn)",
+        "why": "NullReferenceException: inn is null. It was declared but never built."
+      },
+      {
+        "card": "= Room",
+        "why": "CS0119: Room is a type, not a value. Use new Room()."
+      }
+    ],
+    "mechanic": "slots",
+    "review": "C07. The most common runtime crash."
+  }
+]

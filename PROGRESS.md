@@ -1,5 +1,10 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (question bank)
+- Accomplished: picked the 15 beginner C# mistakes that fit the current 3-slot token cards and wrote them as Q1–Q15, in GAME 220 class order (C01–C07). Each has GIVEN, GOAL, the solution cards and 2 decoys with the real C# result. Saved in docs/question_bank.json; replaced the 9 old puzzle cards on the Build Board and updated its format panel and findings.
+- Decisions: every decoy result is real C# behaviour (compile error code, runtime crash or wrong output). Dropped ideas that need line or file cards for now.
+- Next: review Q1–Q15 on the board; then v0.1 = a per-question outcome evaluator, crash and timeout looks, a 2-line GIVEN, and the levels loaded from the bank.
+
 ## 2026-10-31 (versions)
 - Accomplished: the root index.html is now a version launcher. LIVE opens game/ (the working build); each frozen version opens its own copy. The title screen shows the version number and has an "◀ ALL VERSIONS" link back to the launcher.
 - Accomplished: froze the current game as v0.0, "Phase 1: the castle compiler" (versions/v0.0/, commit 6cf0844). Checked in a browser: v0.0 and LIVE both start and play, the back link works, no errors.
