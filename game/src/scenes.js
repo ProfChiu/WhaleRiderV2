@@ -496,8 +496,8 @@ class LevelScene extends Phaser.Scene {
   }
   // The dealt cards stand in a row between the slots and the nurse (overlapping a little if crowded).
   playerLayout(cards) {
-    const x0 = this.slotX[this.nSlots - 1] + SLOT_W / 2 + 26 + CARD_W / 2, x1 = NURSE_X - 62;
-    const n = cards.length, step = n > 1 ? Math.min(CARD_W + 14, (x1 - x0) / (n - 1)) : 0;
+    const x0 = this.slotX[this.nSlots - 1] + SLOT_W / 2 + 26 + CARD_W / 2, x1 = NURSE_X - 78;
+    const n = cards.length, step = n > 1 ? Math.min(CARD_W + 10, (x1 - x0) / (n - 1)) : 0;
     const pos = new Map();
     cards.forEach((c, i) => { pos.set(c, { x: x0 + i * step, y: SLOT_Y }); c.baseDepth = 10 + i * 0.01; c.setDepth(c.baseDepth); });
     return pos;
@@ -650,14 +650,15 @@ class LevelScene extends Phaser.Scene {
   }
   // The castle reads the filled slots from slot 1 to the first gap (see levels.js for the rules).
   evaluate() {
-    const s = this.slots, L = this.L, sol = L.solution;
+    const s = this.slots, L = this.L, sols = [L.solution, ...(L.alt || [])];
     for (let i = 0; i < s.length; i++) if (s[i] && s[i].def.out) return { out: s[i].def.out, cards: [i] };
     let n = 0; while (n < s.length && s[n]) n++;
     const run = s.slice(0, n).map(c => c.def.id), all = [...Array(n).keys()];
     for (const q of L.seq || []) if (sameList(run, q.run)) return { out: q.out, cards: all };
-    if (sameList(run, sol)) return { win: true, used: n };
-    const bad = run.findIndex((id, i) => id !== sol[i]);
-    if (bad < 0) return {};                                      // so far so good: keep going
+    if (sols.some(sol => sameList(run, sol))) return { win: true, used: n };
+    // how far the run matches its closest answer
+    const bad = Math.max(...sols.map(sol => { const k = run.findIndex((id, i) => id !== sol[i]); return k < 0 ? n : k; }));
+    if (bad >= n) return {};                                     // so far so good: keep going
     return { out: ORDER_FAIL, cards: all.slice(bad) };
   }
   resume() { this.state = 'play'; this.updateGlow(); this.refreshBoard(); }
@@ -706,7 +707,9 @@ class LevelScene extends Phaser.Scene {
   }
   showHintCard() {
     const idx = this.slots.indexOf(null);
-    const id = this.L.solution[idx];
+    const placed = this.slots.slice(0, idx).map(c => c && c.def.id);
+    const sol = [this.L.solution, ...(this.L.alt || [])].find(a => placed.every((id, i) => id === a[i])) || this.L.solution;
+    const id = sol[idx];
     const card = this.cards.find(c => c.def.id === id && c.slotIndex === null);
     if (card) card.setHint(true);
   }

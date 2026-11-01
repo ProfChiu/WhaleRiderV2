@@ -4,8 +4,8 @@
 // every placement the castle reads the filled slots from slot 1 until the first gap:
 //   1. a placed card with an `out` fails at once with that outcome (each decoy = one mistake)
 //   2. a filled run that matches a `seq` outcome fails with that outcome
-//   3. the run equals `solution`            → WIN (unused lights switch on by themselves)
-//   4. the run is the start of `solution`   → keep going
+//   3. the run equals `solution` (or one in `alt`) → WIN (unused lights switch on by themselves)
+//   4. the run is the start of one of them        → keep going
 //   5. anything else                        → "won't compile in this order"
 //
 // Outcome kinds (each has its own look on the castle):
@@ -72,18 +72,20 @@ window.LEVELS = [
   },
   {
     title: 'The Fall Check', course: 'C02', slots: 3,
-    given: 'int health = 0;\n// if (?) Console.WriteLine("You fall.");',
-    code: ["int health = 0;", "{1}{2}{3}", "    Console.WriteLine(\"You fall.\");"],
+    given: 'int health = 10;  int trap = 15;  health = health - trap;',
+    code: ["int health = 10;", "int trap = 15;", "health = health - trap;", "{1}{2}{3}", "    Console.WriteLine(\"You fall.\");"],
     goal: 'prints  You fall.',
     cards: [
       { id: 'if', label: 'if (' },
-      { id: 'eq', label: 'health == 0' },
+      { id: 'lt', label: 'health < 0' },
+      { id: 'le', label: 'health <= 0' },
       { id: 'close', label: ')' },
+      { id: 'eq', label: 'health == 0', out: output('prints nothing', 'It runs, but track the value: 10 - 15 = -5. health is -5, not 0, so nothing prints.') },
       { id: 'assign', label: 'health = 0', out: compile('CS0029', 'Cannot implicitly convert type int to bool. = STORES a value. == ASKS a question.') },
-      { id: 'ne', label: 'health != 0', out: output('prints nothing', 'It runs, but != means NOT equal. health IS 0, so the check is false and nothing prints.') },
     ],
-    solution: ['if', 'eq', 'close'],
-    legal: ['if (health == 0)', '// == compares: is health equal to 0? Yes.', '// Output: You fall.  ✔'],
+    solution: ['if', 'lt', 'close'],
+    alt: [['if', 'le', 'close']],          // either check is correct
+    legal: ['if (health < 0)', '// 10 - 15 = -5. Is -5 below 0? Yes: You fall.', '// health <= 0 works too, and also catches exactly 0.  ✔'],
   },
   {
     title: 'Show the HP', course: 'C02', slots: 3,

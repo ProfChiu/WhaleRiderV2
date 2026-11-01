@@ -82,25 +82,25 @@
     "title": "The Fall Check",
     "concept": "C02 · = assigns, == compares",
     "status": "idea",
-    "given": "int health = 0;",
-    "goal": "if ( ? )  prints \"You fall.\"",
+    "given": "int health = 10;\nint trap = 15;\nhealth = health - trap;",
+    "goal": "if ( ? ) prints  You fall.",
     "solution": [
       "if (",
-      "health == 0",
+      "health < 0  or  health <= 0",
       ")"
     ],
     "decoys": [
       {
-        "card": "health = 0",
-        "why": "CS0029: cannot implicitly convert int to bool. = stores a value; == asks a question."
+        "card": "health == 0",
+        "why": "Runs, but prints nothing: 10 - 15 = -5, and health is -5, not 0. Track the value!"
       },
       {
-        "card": "health != 0",
-        "why": "Runs, but prints nothing: != means NOT equal, and health IS 0."
+        "card": "health = 0",
+        "why": "CS0029: cannot implicitly convert int to bool. = assigns, == compares."
       }
     ],
     "mechanic": "slots",
-    "review": "The course's #1 bug (C02 demo).",
+    "review": "Logic level: two correct answers (< 0 and <= 0). Players must track health through 3 lines first.",
     "slots": 3
   },
   {
