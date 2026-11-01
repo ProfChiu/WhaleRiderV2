@@ -1,5 +1,10 @@
 # Whale Rider: Code Quest — Progress
 
+## 2026-10-31 (approval buttons)
+- Accomplished: each question on the Build Board now has an Approve button (with Undo), and the bank header counts how many are approved. The status dropdown is gone.
+- Decisions: Wan only approves. Built and Tested are set by Claude: Built once a question is in the live game, Tested once the automated playthrough passes.
+- Next: approve questions on the board; v0.1 builds the approved ones.
+
 ## 2026-10-31 (question bank)
 - Accomplished: picked the 15 beginner C# mistakes that fit the current 3-slot token cards and wrote them as Q1–Q15, in GAME 220 class order (C01–C07). Each has GIVEN, GOAL, the solution cards and 2 decoys with the real C# result. Saved in docs/question_bank.json; replaced the 9 old puzzle cards on the Build Board and updated its format panel and findings.
 - Decisions: every decoy result is real C# behaviour (compile error code, runtime crash or wrong output). Dropped ideas that need line or file cards for now.
