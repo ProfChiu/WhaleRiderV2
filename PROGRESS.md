@@ -5,6 +5,7 @@
 - Accomplished: the billboard is bigger (800×322) and stands behind the castle, with all content right of the tower. It shows the code listing with numbered blanks ①–④; a card dropped in a slot turns its blank into that code. Failing cards turn the outcome color, and on a win the listing becomes the plain compiled program plus a WHY note.
 - Accomplished: an art drop-in. Put game/art/<texture>.png and run tools/build_art.py; drawn stand-ins are used only for what's missing (game/art/README.md lists the names and sizes). Tested with dummy art.
 - Verified: an automated playthrough of all 15 levels, no console errors.
+- Fix: Q4's decoy `health < 0` was arguably correct game logic. It is now `health != 0`, which is clearly wrong since health is 0.
 - Next: Wan playtests; freeze as v0.1; final art.
 
 ## 2026-10-31 (v0.1 build)

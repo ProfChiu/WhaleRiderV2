@@ -80,7 +80,7 @@ window.LEVELS = [
       { id: 'eq', label: 'health == 0' },
       { id: 'close', label: ')' },
       { id: 'assign', label: 'health = 0', out: compile('CS0029', 'Cannot implicitly convert type int to bool. = STORES a value. == ASKS a question.') },
-      { id: 'lt', label: 'health < 0', out: output('prints nothing', 'It runs, but health is 0, not below 0. So nothing prints.') },
+      { id: 'ne', label: 'health != 0', out: output('prints nothing', 'It runs, but != means NOT equal. health IS 0, so the check is false and nothing prints.') },
     ],
     solution: ['if', 'eq', 'close'],
     legal: ['if (health == 0)', '// == compares: is health equal to 0? Yes.', '// Output: You fall.  ✔'],

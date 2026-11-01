@@ -95,8 +95,8 @@
         "why": "CS0029: cannot implicitly convert int to bool. = stores a value; == asks a question."
       },
       {
-        "card": "health < 0",
-        "why": "Runs, but prints nothing: health is 0, not below 0."
+        "card": "health != 0",
+        "why": "Runs, but prints nothing: != means NOT equal, and health IS 0."
       }
     ],
     "mechanic": "slots",
