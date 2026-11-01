@@ -25,24 +25,24 @@ const timeout = (msg) => ({ kind: 'timeout', tag: 'never ends', msg });
 window.LEVELS = [
   {
     title: 'Wake the Terminal', course: 'C01', slots: 3,
-    given: '// Print a greeting to the terminal',
-    code: ["// Print a greeting to the terminal", "{1}{2}{3}"],
-    goal: 'Output:  Welcome, traveler!',
+    given: 'public static void Main() { ? }',
+    code: ["public static void Main()", "{", "    {1}{2}{3}", "}"],
+    goal: 'Output:  HELLO!',
     cards: [
-      { id: 'con', label: 'Console' },
-      { id: 'wl', label: '.WriteLine("Welcome, traveler!")' },
+      { id: 'con', label: 'Console.WriteLine' },
+      { id: 'msg', label: '("HELLO!")' },
       { id: 'semi', label: ';' },
-      { id: 'lower', label: 'console', out: compile('CS0103', "The name 'console' does not exist. C# is case-sensitive: it's Console with a capital C.") },
+      { id: 'lower', label: 'console.writeline', out: compile('CS0103', "The name 'console' does not exist. C# is case-sensitive: it's Console.WriteLine, capital C and capital W.") },
       { id: 'colon', label: ':', out: compile('CS1002', '"; expected". A colon is not a semicolon. Statements end with ;') },
     ],
-    solution: ['con', 'wl', 'semi'],
-    legal: ['Console.WriteLine("Welcome, traveler!");', '// Console, capital C. The ; ends the statement.', '// Output: Welcome, traveler!  ✔'],
+    solution: ['con', 'msg', 'semi'],
+    legal: ['Console.WriteLine("HELLO!");', '// The program starts in Main(). Capital C, capital W.', '// The ; ends the statement. Output: HELLO!  ✔'],
   },
   {
     title: 'Name the Hero', course: 'C01', slots: 3,
     given: "// Store the hero's name",
     code: ["// Store the hero's name", "{1} {2}{3}"],
-    goal: 'string hero = "Mira";',
+    goal: 'the variable hero holds the name Mira',
     cards: [
       { id: 'decl', label: 'string hero =' },
       { id: 'val', label: '"Mira"' },
@@ -237,7 +237,7 @@ window.LEVELS = [
   {
     title: 'The Empty Room', course: 'C07', slots: 4,
     given: 'class World {  Room inn;\n  void Start() { ? }  }',
-    code: ["class World", "{", "    Room inn;", "    void Start()", "    {", "        {1}", "        {2} {3} {4}", "    }"],
+    code: ["class World", "{", "    Room inn;", "    void Start() {", "        {1}", "        {2} {3} {4}", "    }", "}"],
     goal: 'the world\'s inn is named "Inn"',
     cards: [
       { id: 'make', label: 'inn = new Room();' },

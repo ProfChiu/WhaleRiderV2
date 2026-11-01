@@ -7,7 +7,7 @@ const SLOT_W = 74, SLOT_H = 110, SLOT_GAP = 10;                   // drop target
 const SLOT_X0 = 250, SLOT_Y = GROUND - 8 - SLOT_H / 2;            // answer slots stand beside the castle
 const PLACED_S = (SLOT_W - 6) / CARD_W;                           // a card shrinks to sit in its slot
 const BOARD = { x: 110, y: 50, w: 800, h: 322 };  // billboard behind the castle; its left edge hides behind the tower
-const BOARD_TEXT_X = 250, CODE_X = 304, CODE_Y0 = 84, CODE_LH = 24;   // board content starts right of the tower
+const BOARD_TEXT_X = 250, CODE_X = 348, CODE_Y0 = 84, CODE_LH = 24;   // board content starts right of the tower
 const LIGHT_OFF = 0x555c62;
 const NURSE_X = 1210, NURSE_H = 210;
 const TOWER_X = 20, TOWER_TOP = GROUND - 330;
@@ -372,15 +372,16 @@ class LevelScene extends Phaser.Scene {
     this.board = this.add.graphics();
     this.boardArt = this.textures.exists('board') ? this.add.image(0, 0, 'board').setDisplaySize(B.w, B.h) : null;
     this.tab = this.add.graphics();
-    this.tabText = txt(this, this.X(BOARD_TEXT_X + 65), this.Y(B.y), 'QUESTION', { fontSize: '13px', fontStyle: 'bold', color: '#12393a', letterSpacing: 2 }).setOrigin(0.5);
+    this.tabText = txt(this, this.X(BOARD_TEXT_X + 65), this.Y(B.y), 'COMPILER', { fontSize: '13px', fontStyle: 'bold', color: '#12393a', letterSpacing: 2 }).setOrigin(0.5);
     this.codeRows = this.add.container(0, 0);
+    this.qLabel = txt(this, this.X(BOARD_TEXT_X), this.Y(CODE_Y0 + 2), 'QUESTION', { fontSize: '13px', color: PAL.accentHex, fontStyle: 'bold' });
     const goalY = CODE_Y0 + this.L.code.length * CODE_LH + 14;
     this.goalLabel = txt(this, this.X(BOARD_TEXT_X), this.Y(goalY + 6), 'GOAL', { fontSize: '13px', color: PAL.accentHex, fontStyle: 'bold' });
     this.goalText = txt(this, this.X(CODE_X), this.Y(goalY), this.L.goal, { fontFamily: MONO, fontSize: '17px', color: '#ffffff', fontStyle: 'bold', backgroundColor: '#1f5f61', padding: { x: 8, y: 4 } });
     this.legalNote = txt(this, this.X(CODE_X), this.Y(goalY), '', { fontFamily: MONO, fontSize: '14px', color: '#9fd9d9', lineSpacing: 4 });
     this.boardHead = txt(this, this.X(BOARD_TEXT_X), this.Y(B.y + B.h - 31), '', { fontFamily: MONO, fontSize: '15px', fontStyle: 'bold' });
     this.boardStatus = txt(this, this.X(BOARD_TEXT_X), this.Y(B.y + B.h - 30), '', { fontSize: '14px', color: '#aeb5ba' });
-    this.bb.add([this.board, ...(this.boardArt ? [this.boardArt] : []), this.tab, this.tabText, this.codeRows,
+    this.bb.add([this.board, ...(this.boardArt ? [this.boardArt] : []), this.tab, this.tabText, this.qLabel, this.codeRows,
       this.goalLabel, this.goalText, this.legalNote, this.boardHead, this.boardStatus]);
     this.failIdx = [];
     this.setBoardBorder(PAL.accent);
@@ -559,9 +560,22 @@ class LevelScene extends Phaser.Scene {
     t1.destroy(); t2.destroy();
   }
   async popQuestion() {
+    const items = [this.qLabel, ...this.codeRows.list, this.goalLabel, this.goalText];
+    items.forEach(t => t.setVisible(false));
     Sfx.flip();
     await this.tweenP({ targets: this.bb, alpha: 1, scale: 1, duration: 450, ease: 'Back.Out' });
-    await wait(this, 250);
+    await this.typeBoard(items);
+    await wait(this, 200);
+  }
+  // A very quick typewriter: plain code types out two characters at a time; blanks pop in whole.
+  async typeBoard(items) {
+    for (const t of items) {
+      t.setVisible(true);
+      const full = t.text;
+      if (t.style.backgroundColor && t !== this.goalText) { Sfx.tone(900, 0.03, 'square', 0.03); continue; }
+      for (let i = 2; i < full.length; i += 2) { t.setText(full.slice(0, i)); await wait(this, 9); }
+      t.setText(full);
+    }
   }
 
   // ----- play -----
@@ -777,7 +791,7 @@ class LevelScene extends Phaser.Scene {
     this.nurse.setFlipX(window.NURSE_WALK_FACES_RIGHT === true);
     const baseY = GROUND + 8, dist = this.nurse.x - DOOR_CX;
     await new Promise(r => this.tweens.addCounter({
-      from: this.nurse.x, to: DOOR_CX, duration: dist * 3.2, ease: 'Linear',
+      from: this.nurse.x, to: DOOR_CX, duration: dist * 3.2 / 1.5, ease: 'Linear',   // 1.5× walking speed
       onUpdate: tw => {
         const x = tw.getValue(), bob = Math.abs(Math.sin((NURSE_X - x) / 22)) * 8;
         this.nurse.setPosition(x, baseY - bob);

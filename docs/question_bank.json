@@ -4,17 +4,17 @@
     "title": "Wake the Terminal",
     "concept": "C01 · Semicolons end statements; C# is case-sensitive",
     "status": "idea",
-    "given": "// Print a greeting to the terminal",
-    "goal": "Output:  Welcome, traveler!",
+    "given": "public static void Main()\n{\n    ?\n}",
+    "goal": "Output:  HELLO!",
     "solution": [
-      "Console",
-      ".WriteLine(\"Welcome, traveler!\")",
+      "Console.WriteLine",
+      "(\"HELLO!\")",
       ";"
     ],
     "decoys": [
       {
-        "card": "console",
-        "why": "CS0103: the name 'console' does not exist. Case matters: it is Console."
+        "card": "console.writeline",
+        "why": "CS0103: the name 'console' does not exist. Case matters: Console.WriteLine."
       },
       {
         "card": ":",
@@ -22,7 +22,7 @@
       }
     ],
     "mechanic": "slots",
-    "review": "Mistake #1 and #2 in one level. A good first-day warm-up.",
+    "review": "Only level that shows Main(): sets the format on day one (C01 \"Where does the program start?\").",
     "slots": 3
   },
   {
@@ -31,7 +31,7 @@
     "concept": "C01 · Text needs double quotes",
     "status": "idea",
     "given": "// Store the hero's name",
-    "goal": "string hero = \"Mira\";",
+    "goal": "the variable hero holds the name Mira",
     "solution": [
       "string hero =",
       "\"Mira\"",

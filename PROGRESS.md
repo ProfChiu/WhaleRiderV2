@@ -5,6 +5,8 @@
 - Accomplished: cards are bigger (104×156). Drop slots are small targets (74×110), and a placed card shrinks to sit in its slot, since the board shows its full code.
 - Accomplished: Q9's goal now reads "if key is the character 'A', runs Attack() and stops". Q11 now gives the `while (gold < 100) { … }` loop and the player fills in the body (`gold` › `+= 10;`; `-= 10;` and printing time out, `+ 10;` gives CS0201).
 - Verified: all 15 levels plus a real mouse drag, no console errors. The question bank and Build Board are updated.
+- Q1 now sits inside `public static void Main()` (the only level that shows it; it sets the format). Cards are `Console.WriteLine` / `console.writeline` / `("HELLO!")` / `;` / `:`, and the output is HELLO!. Q2's goal now reads "the variable hero holds the name Mira", so it can't be copied onto the cards. Q15's listing now closes the class with `}`.
+- UI: the board types the question out quickly (two characters at a time, blanks pop in). The code has a QUESTION label to match GOAL, and the tab reads COMPILER (COMPILED ✔ on a win). The nurse walks into the castle 1.5× faster.
 - Next: Wan playtests; freeze as v0.1.
 
 ## 2026-10-31 (card layout)
