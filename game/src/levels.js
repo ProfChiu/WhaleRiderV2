@@ -150,7 +150,7 @@ window.LEVELS = [
     title: 'The Menu That Fell Through', course: 'C03', slots: 3,
     given: 'switch (key) {\n  // case \'D\': Defend(); break;',
     code: ["switch (key)", "{", "  {1} {2} {3}", "  case 'D': Defend(); break;", "}"],
-    goal: "case 'A' runs Attack() and stops",
+    goal: "if key is the character 'A', runs Attack() and stops",
     cards: [
       { id: 'case', label: "case 'A':" },
       { id: 'atk', label: 'Attack();' },

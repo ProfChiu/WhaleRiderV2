@@ -212,7 +212,7 @@
     "concept": "C03 · Every switch case needs break",
     "status": "idea",
     "given": "switch (key) {",
-    "goal": "case 'A': runs Attack() and stops",
+    "goal": "if key is the character 'A', runs Attack() and stops",
     "solution": [
       "case 'A':",
       "Attack();",
